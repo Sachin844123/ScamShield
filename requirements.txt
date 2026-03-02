@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+boto3
+python-telegram-bot
+sqlalchemy
+python-dotenv
+jinja2
+requests
+groq

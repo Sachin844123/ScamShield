@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScamShield</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        soc: {
+                            900: '#030712', /* Deep modern black */
+                            800: '#0B0F19',
+                            700: '#111827',
+                            border: 'rgba(255,255,255,0.08)'
+                        },
+                        cyber: {
+                            blue: '#3B82F6',
+                            purple: '#A855F7',
+                            green: '#10B981',
+                            red: '#EF4444',
+                            yellow: '#F59E0B',
+                            teal: '#14B8A6'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'dash': 'dash 1.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        dash: {
+                            '0%': { strokeDasharray: '0, 100' },
+                            '100%': { strokeDasharray: 'var(--target-score), 100' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #030712;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.06) 0%, transparent 40%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--soc-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+
+        /* Gauge SVG Styles */
+        .gauge-container {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .circular-chart {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 3;
+        }
+
+        .circle {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            transform-origin: center;
+            transform: rotate(-90deg);
+            /* Animated via JS setting inline style */
+            transition: stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-cyber-purple/30 selection:text-white pb-12">
+
+    <!-- 1️⃣ Navbar -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-white/5 px-6 py-4 flex justify-between items-center mb-8">
+        <div class="flex items-center gap-3">
+            <div
+                class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-cyber-blue/20 border border-cyber-blue/30">
+                <i
+                    class="fa-solid fa-shield-virus text-cyber-blue text-lg shadow-cyber-blue drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"></i>
+            </div>
+            <span
+                class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">ScamShield</span>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+            <span class="hover:text-white cursor-pointer transition-colors"><i
+                    class="fa-solid fa-globe-asia mr-2 text-cyber-teal"></i>AI for Bharat</span>
+            <a href="https://t.me/ScamShield_Official_Bot" target="_blank"
+                class="hover:text-white cursor-pointer transition-colors"><i
+                    class="fa-brands fa-telegram mr-2 text-cyber-blue"></i>Telegram Bot</a>
+            <span class="hover:text-white cursor-pointer transition-colors"><i
+                    class="fa-brands fa-github mr-2"></i>GitHub</span>
+        </div>
+        <div class="md:hidden flex items-center">
+            <i class="fa-solid fa-bars text-gray-400"></i>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-6 relative">
+
+        <!-- Left + Center Columns -->
+        <div class="lg:col-span-3 space-y-6">
+
+            <!-- 2️⃣ Hero Input Card -->
+            <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
+                <!-- Subtle top border glow -->
+                <div
+                    class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyber-blue/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                </div>
+
+                <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-satellite-dish text-cyber-blue"></i> Threat Telemetry Input
+                </h2>
+
+                <form id="analyzeForm" onsubmit="event.preventDefault(); window.analyzeMessage();">
+                    <div class="relative">
+                        <textarea id="messageInput"
+                            class="w-full glass-input rounded-xl p-5 text-gray-200 resize-y min-h-[140px] font-mono text-sm leading-relaxed"
+                            placeholder="Paste suspicious SMS, Email, or WhatsApp message here...&#10;&#10;System detects: Hindi, Hinglish, Marathi, Bengali, Tamil, & English formats."
+                            required></textarea>
+
+                        <!-- Actions Row -->
+                        <div class="flex justify-between items-center mt-4">
+                            <div class="flex items-center gap-4">
+                                <span id="charCount" class="text-xs font-mono text-gray-500">0 chars</span>
+                            </div>
+
+                            <button type="submit" id="analyzeBtn"
+                                class="bg-gradient-to-r from-cyber-blue to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-[0_0_15px_rgba(59,130,246,0.25)] hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] flex items-center gap-2">
+                                <span>🔎 Analyze Message Threat</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Loading Overlay -->
+                <div id="loadingOverlay"
+                    class="absolute inset-0 bg-soc-900/90 backdrop-blur-md hidden flex-col justify-center items-center z-10 transition-opacity border border-white/5 rounded-2xl">
+                    <div class="relative w-16 h-16 mb-4">
+                        <svg class="animate-spin w-full h-full text-cyber-blue" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3">
+                            </circle>
+                            <path class="opacity-100" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        <i
+                            class="fa-solid fa-microchip absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    </div>
+                    <p id="loadingText" class="text-cyber-blue font-mono text-sm tracking-wide animate-pulse">
+                        Initializing semantic analysis pipeline...</p>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="errorBanner"
+                class="hidden glass-panel border-red-500/30 bg-red-500/10 rounded-xl p-4 flex items-start gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-red-500 mt-0.5"></i>
+                <div class="flex-1">
+                    <h4 class="text-sm font-bold text-red-500">Analysis Pipeline Failure</h4>
+                    <p id="errorMsg" class="text-xs text-red-400 mt-1 font-mono"></p>
+                </div>
+                <button onclick="document.getElementById('errorBanner').classList.add('hidden')"
+                    class="text-red-500/60 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- 3️⃣ Results Dashboard Section (Hidden by Default) -->
+            <div id="resultsDashboard" class="hidden space-y-6 animate-[fadeIn_0.5s_ease-out]">
+
+                <!-- Top Split: Gauge + Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Left: Risk Gauge Card -->
+                    <div
+                        class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
+                        <!-- Dynamic glow background -->
+                        <div id="gaugeGlowBg"
+                            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-cyber-green rounded-full blur-[80px] opacity-20 transition-colors duration-1000">
+                        </div>
+
+                        <div class="w-full mb-4">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Threat
+                                Risk Assessment</h3>
+                        </div>
+
+                        <div class="gauge-container">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path id="riskCircle" class="circle" stroke-dasharray="0, 100" stroke="#10B981"
+                                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="gaugeNumber"
+                                    class="text-4xl font-bold font-mono tracking-tighter text-white">0</span>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] mt-1">Score</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center z-10">
+                            <span id="riskSeverityLabel"
+                                class="text-sm font-bold uppercase tracking-widest px-4 py-1.5 rounded-full bg-soc-900/80 border text-cyber-green border-cyber-green/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]">Low
+                                Threat</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Threat Overview Card (Hybrid DB breakdown) -->
+                    <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                                <div class="flex items-center gap-2">
+                                    <i class="fa-solid fa-layer-group text-gray-400"></i>
+                                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Hybrid
+                                        Intelligence</h3>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                <span
+                                    class="px-3 py-1.5 bg-soc-900 border border-cyber-purple/40 text-cyber-purple rounded-md text-xs font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-tag"></i> <span id="scamTypeBadge">Unknown</span>
+                                </span>
+                                <span
+                                    class="px-3 py-1.5 bg-soc-900 border border-cyber-blue/40 text-cyber-blue rounded-md text-xs font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-language"></i> <span id="langBadge">English</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 bg-soc-900/50 rounded-xl p-4 border border-white/5">
+                            <div class="flex justify-between items-center">
+                                <span
+                                    class="text-gray-400 text-xs font-medium uppercase tracking-wide flex items-center gap-2"><i
+                                        class="fa-solid fa-brain text-cyber-purple/70"></i> Semantic Base Score</span>
+                                <span id="aiScoreVal" class="font-mono text-sm text-gray-300">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span
+                                    class="text-gray-400 text-xs font-medium uppercase tracking-wide flex items-center gap-2"><i
+                                        class="fa-solid fa-microchip text-cyber-blue/70"></i> Deterministic Boost</span>
+                                <span id="ruleBoostVal" class="font-mono text-sm text-cyber-blue">+0</span>
+                            </div>
+                            <div class="h-[1px] bg-white/10 w-full my-2"></div>
+                            <div class="flex justify-between items-center">
+                                <span
+                                    class="text-gray-300 text-xs font-bold uppercase tracking-wide flex items-center gap-2"><i
+                                        class="fa-solid fa-crosshairs text-gray-400"></i> Final Risk Vector</span>
+                                <span id="finalScoreVal" class="font-mono text-lg font-bold">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screenshot Panel -->
+                <div id="screenshotContainer" class="hidden">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em] mb-3 ml-1">
+                        <i class="fa-solid fa-camera text-cyber-blue mr-1"></i> Website Preview & Live Intelligence
+                    </h3>
+                    <div class="glass-panel p-2 rounded-2xl border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)] mb-6">
+                        <img id="screenshotImg" src="" alt="Live Website Preview"
+                            class="w-full max-h-[400px] object-contain rounded-xl border border-white/5 opacity-90 hover:opacity-100 transition-opacity">
+                    </div>
+                </div>
+
+                <!-- 4️⃣ Psychological Trick Section -->
+                <div>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em] mb-3 ml-1">Psychological
+                        Vectors Detected</h3>
+                    <div id="psychTricksContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- 5️⃣ Explanation Panel -->
+                <div class="glass-panel border-white/10 rounded-2xl overflow-hidden transition-all">
+                    <button onclick="toggleExplanation()"
+                        class="w-full px-6 py-4 flex justify-between items-center hover:bg-white/5 transition-colors focus:outline-none">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-cyber-blue/10 flex items-center justify-center border border-cyber-blue/20">
+                                <i class="fa-solid fa-magnifying-glass-chart text-cyber-blue text-sm"></i>
+                            </div>
+                            <span class="font-bold text-sm tracking-wide text-gray-200">Threat Matrix Explanation</span>
+                        </div>
+                        <i id="explChevron"
+                            class="fa-solid fa-chevron-down text-gray-500 transition-transform duration-300"></i>
+                    </button>
+                    <div id="explanationContent"
+                        class="hidden border-t border-white/5 px-6 pb-6 pt-4 text-sm text-gray-300 leading-relaxed font-sans bg-black/20">
+                        <p id="explanationText"></p>
+                    </div>
+                </div>
+
+                <!-- 6️⃣ Recommended Action Panel -->
+                <div id="actionContainer" class="border rounded-2xl p-6 relative overflow-hidden bg-soc-900/50">
+                    <div id="actionLeftBar" class="absolute top-0 left-0 w-[3px] h-full"></div>
+
+                    <h3 id="actionTitle"
+                        class="text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-shield-check"></i> Mitigation Protocol
+                    </h3>
+
+                    <div class="bg-black/30 rounded-xl p-4 border border-white/5">
+                        <ul id="actionList" class="list-disc list-inside space-y-2 text-sm text-gray-300 font-medium">
+                            <!-- Injected generated bullets -->
+                        </ul>
+                    </div>
+
+                    <!-- Critical Action Alert (Hidden if risk <= 70) -->
+                    <div id="criticalActionBlock"
+                        class="hidden mt-4 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+                        <p
+                            class="text-xs font-bold text-red-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-tower-broadcast animate-pulse"></i> External Escalation Required
+                        </p>
+                        <div class="flex flex-wrap gap-3">
+                            <a href="tel:1930"
+                                class="flex items-center gap-2 bg-soc-900 border border-red-500/30 text-red-400 px-4 py-2 rounded-lg text-sm font-mono shadow-[0_0_10px_rgba(239,68,68,0.15)] hover:bg-red-500/10 transition-colors">
+                                <i class="fa-solid fa-phone"></i> 1930 (Cyber Fraud)
+                            </a>
+                            <a href="https://cybercrime.gov.in" target="_blank"
+                                class="flex items-center gap-2 bg-soc-900 border border-blue-500/30 text-blue-400 px-4 py-2 rounded-lg text-sm font-mono shadow-[0_0_10px_rgba(59,130,246,0.15)] hover:bg-blue-500/10 transition-colors">
+                                <i class="fa-solid fa-gavel"></i> cybercrime.gov.in
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 7️⃣ Threat History Sidebar -->
+        <div class="hidden lg:block lg:col-span-1">
+            <div class="glass-panel rounded-2xl p-5 sticky top-24 max-h-[calc(100vh-120px)] flex flex-col">
+                <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em] flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Analysis Log
+                    </h3>
+                    <span class="flex h-2 w-2">
+                        <span
+                            class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-cyber-green opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-cyber-green"></span>
+                    </span>
+                </div>
+
+                <!-- History Items -->
+                <div id="historyFeed" class="space-y-3 overflow-y-auto pr-1 flex-1">
+                    <div
+                        class="text-[11px] text-gray-500 font-mono text-center py-6 border border-dashed border-gray-700 rounded-lg">
+                        SYSTEM READY<br>AWAITING TELEMETRY
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Vanilla JS Logic -->
+    <script>
+        // UI Interaction Handlers
+        const messageInput = document.getElementById('messageInput');
+        messageInput.addEventListener('input', (e) => {
+            document.getElementById('charCount').textContent = `${e.target.value.length} chars`;
+        });
+
+        function toggleExplanation() {
+            const content = document.getElementById('explanationContent');
+            const icon = document.getElementById('explChevron');
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        // FontAwesome Mapping for Tricks
+        const trickIcons = {
+            'fear': 'fa-ghost text-red-400',
+            'urgency': 'fa-stopwatch text-orange-400',
+            'authority': 'fa-building-columns text-soc-blue-400',
+            'reward': 'fa-gift text-cyber-purple',
+            'scarcity': 'fa-hourglass-half text-yellow-400',
+            'impersonation': 'fa-masks-theater text-cyber-teal'
+        };
+
+        async function analyzeMessage() {
+            const msg = messageInput.value.trim();
+            if (!msg) return;
+
+            // Reset UI State
+            document.getElementById('errorBanner').classList.add('hidden');
+            document.getElementById('resultsDashboard').classList.add('hidden');
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+
+            // UX Loading Sequence
+            const loadingText = document.getElementById('loadingText');
+            loadingText.textContent = "Running AI semantic language processing...";
+
+            let loadTimer = setTimeout(() => {
+                loadingText.textContent = "Executing deterministic rule boosts...";
+            }, 1200);
+
+            try {
+                // Fetch to FastAPI backend
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server returned ${response.status}`);
+                }
+
+                const data = await response.json();
+                clearTimeout(loadTimer);
+
+                // Slight artificially delayed execution to allow UI animation
+                setTimeout(() => {
+                    overlay.classList.remove('flex');
+                    overlay.classList.add('hidden');
+                    renderResults(data);
+                }, 500);
+
+            } catch (err) {
+                clearTimeout(loadTimer);
+                overlay.classList.remove('flex');
+                overlay.classList.add('hidden');
+
+                document.getElementById('errorMsg').textContent = err.message;
+                document.getElementById('errorBanner').classList.remove('hidden');
+            }
+        }
+
+        function renderResults(data) {
+            // Map JSON Data
+            const aiScore = data.ai_base_score || 0;
+            const finalScore = data.risk_score || 0;
+            const ruleBoost = data.rule_boost || 0;
+            const language = data.language || 'Unknown';
+            const scamType = data.scam_type || 'Unclassified Threat';
+            const explanation = data.explanation || 'No explanation generated.';
+            const recommendedAction = data.recommended_action || 'Proceed with caution.';
+
+            // 1. Color Logic
+            let colorHex, colorClass, severityText;
+            if (finalScore <= 30) {
+                colorHex = '#10B981'; colorClass = 'text-cyber-green'; severityText = 'Low Threat';
+            } else if (finalScore <= 70) {
+                colorHex = '#F59E0B'; colorClass = 'text-cyber-yellow'; severityText = 'Medium Risk';
+            } else {
+                colorHex = '#EF4444'; colorClass = 'text-cyber-red'; severityText = 'CRITICAL THREAT';
+            }
+
+            // 2. Render Gauge
+            const riskCircle = document.getElementById('riskCircle');
+            riskCircle.style.strokeDasharray = `${finalScore}, 100`;
+            riskCircle.setAttribute('stroke', colorHex);
+
+            document.getElementById('gaugeNumber').textContent = finalScore;
+
+            const badge = document.getElementById('riskSeverityLabel');
+            badge.textContent = severityText;
+            badge.className = `text-sm font-bold uppercase tracking-widest px-4 py-1.5 rounded-full bg-soc-900/80 border ${colorClass}`;
+            badge.style.borderColor = `rgba(${hexToRgb(colorHex)}, 0.3)`;
+            badge.style.boxShadow = `0 0 10px rgba(${hexToRgb(colorHex)}, 0.2)`;
+
+            // Render glow background
+            const glow = document.getElementById('gaugeGlowBg');
+            glow.className = `absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full blur-[80px] opacity-20 transition-colors duration-1000`;
+            glow.style.backgroundColor = colorHex;
+
+            // 3. Render Badges & Breakdown
+            document.getElementById('scamTypeBadge').textContent = scamType;
+            document.getElementById('langBadge').textContent = language;
+            document.getElementById('aiScoreVal').textContent = aiScore;
+            document.getElementById('ruleBoostVal').textContent = `+${ruleBoost}`;
+            document.getElementById('finalScoreVal').textContent = finalScore;
+            document.getElementById('finalScoreVal').className = `font-mono text-xl font-bold ${colorClass}`;
+
+            // 4. Render Screenshot if available
+            const screenshotContainer = document.getElementById('screenshotContainer');
+            if (data.screenshot_url) {
+                document.getElementById('screenshotImg').src = data.screenshot_url;
+                screenshotContainer.classList.remove('hidden');
+            } else {
+                screenshotContainer.classList.add('hidden');
+            }
+
+            // 5. Render Psychological Tricks
+            const tricksContainer = document.getElementById('psychTricksContainer');
+            tricksContainer.innerHTML = '';
+
+            // Parse tricks block "Fear + Urgency" into array via RegEx separator
+            let trickList = [];
+            if (data.psychological_trick) {
+                trickList = data.psychological_trick.split(/[\+&,]/).map(t => t.trim()).filter(Boolean);
+            }
+            if (trickList.length === 0) trickList = ["Direct Phishing"];
+
+            trickList.forEach(trick => {
+                let iconClass = 'fa-brain text-cyber-purple';
+                let tLower = trick.toLowerCase();
+                for (const [key, val] of Object.entries(trickIcons)) {
+                    if (tLower.includes(key)) iconClass = val;
+                }
+
+                tricksContainer.innerHTML += `
+                    <div class="glass-panel rounded-xl p-4 flex items-center gap-4 bg-soc-900/50 border-white/5 hover:bg-soc-800 transition-colors border-l-2" style="border-left-color: ${colorHex}">
+                        <div class="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center border border-white/5">
+                            <i class="fa-solid ${iconClass} text-lg"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Tactic</h4>
+                            <p class="text-sm font-bold text-gray-200 capitalize">${trick}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // 5. Render Explanation
+            document.getElementById('explanationText').textContent = explanation;
+
+            // 6. Render Recommended Actions
+            const currentActionContainer = document.getElementById('actionContainer');
+            const actionLeftBar = document.getElementById('actionLeftBar');
+            const actionTitle = document.getElementById('actionTitle');
+
+            currentActionContainer.style.borderColor = `rgba(${hexToRgb(colorHex)}, 0.3)`;
+            currentActionContainer.style.backgroundColor = `rgba(${hexToRgb(colorHex)}, 0.05)`;
+            actionLeftBar.style.backgroundColor = colorHex;
+            actionTitle.className = `text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${colorClass}`;
+            if (finalScore > 70) actionTitle.innerHTML = `<i class="fa-solid fa-triangle-exclamation animate-pulse"></i> Critical Containment Protocol`;
+            else actionTitle.innerHTML = `<i class="fa-solid fa-shield-check"></i> Mitigation Protocol`;
+
+            // Make simple bullet points out of sentences
+            const actionList = document.getElementById('actionList');
+            actionList.innerHTML = '';
+            let sentences = recommendedAction.split('.').filter(s => s.trim().length > 3);
+            if (sentences.length === 0) sentences = [recommendedAction];
+
+            sentences.forEach(s => {
+                actionList.innerHTML += `<li>${s.trim()}</li>`;
+            });
+
+            const critBlock = document.getElementById('criticalActionBlock');
+            if (finalScore > 70) {
+                critBlock.classList.remove('hidden');
+            } else {
+                critBlock.classList.add('hidden');
+            }
+
+            // Unhide Dashboard
+            document.getElementById('resultsDashboard').classList.remove('hidden');
+
+            // Add to Sidebar Feed
+            addToHistory(scamType, finalScore, colorClass, colorHex);
+        }
+
+        // Helper: HEX to RGB string for rgba usage
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ?
+                parseInt(result[1], 16) + ", " + parseInt(result[2], 16) + ", " + parseInt(result[3], 16)
+                : "255, 255, 255";
+        }
+
+        // Add to Sidebar
+        function addToHistory(type, score, colorClass, colorHex) {
+            const feed = document.getElementById('historyFeed');
+
+            // Remove initial system message
+            if (feed.innerHTML.includes('SYSTEM READY')) {
+                feed.innerHTML = '';
+            }
+
+            const timeCode = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            const item = document.createElement('div');
+            item.className = 'bg-soc-900 border border-white/5 rounded-lg p-3 text-sm animate-[fadeIn_0.5s_ease-out] hover:border-white/20 transition-colors flex justify-between items-center';
+            item.innerHTML = `
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-500 font-mono mb-1">${timeCode}</span>
+                    <span class="font-medium text-gray-300 truncate max-w-[150px]" title="${type}">${type}</span>
+                </div>
+                <div class="px-2 py-1 rounded border bg-opacity-10 font-mono text-xs font-bold ${colorClass}" 
+                     style="border-color: rgba(${hexToRgb(colorHex)}, 0.3); background-color: rgba(${hexToRgb(colorHex)}, 0.1);">
+                    ${score}%
+                </div>
+            `;
+
+            feed.prepend(item);
+
+            // Keep only latest 10 items
+            if (feed.children.length > 10) {
+                feed.removeChild(feed.lastChild);
+            }
+        }
+    </script>
+</body>
+</html>
