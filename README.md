@@ -1,96 +1,342 @@
-# 🛡️ ScamShield - AI for Bharat Fraud Prevention Engine
+<div align="center">
 
-ScamShield is a hybrid AI-powered fraud analysis engine deployed on AWS, accessible via Telegram and Web, designed to prevent digital fraud in India by detecting, explaining, scoring, and guiding users about suspicious messages in real time using multilingual intelligence and Indian context-aware rule enhancement.
+# 🛡️ ScamShield
+### *AI-Powered Scam Detection for Bharat*
 
-## 🏗️ 5-Layer System Architecture
+**Built for the AWS Hackathon 2026**
 
-1. **User Interface Layer**: Telegram Bot & Web UI offering real time fraud prevention for users. Frictionless access via Telegram; structured analysis via Web.
-2. **API Layer (`main.py`)**: Central FastAPI backend handling language detection, routing, and data flow.
-3. **AI Analysis Layer (`ai_engine.py`)**: AWS Bedrock (Claude 3.5 Sonnet) providing semantic intelligence, detecting psychological manipulation (e.g., Fear + Urgency), and providing multilingual explanations (Hindi, Hinglish, Marathi, Bengali, Tamil, etc.).
-4. **Risk & Decision Layer (`risk_engine.py`)**: Hybrid rule-based intelligence adding deterministic boosts for Indian-specific scams (KBC Lottery, Mahadiscom, SBI KYC, UPI pattern recognition) and obfuscated urgency text (e.g., "0 T P").
-5. **Storage Layer (`database.py`)**: SQLite automated tracking recording detected language, psychological manipulation tactics, and final risk score to build a fraud intelligence dataset over time.
+[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![AWS Bedrock](https://img.shields.io/badge/AWS_Bedrock-Claude_3.5_Sonnet-FF9900?style=flat&logo=amazonaws&logoColor=white)](https://aws.amazon.com/bedrock/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat)](LICENSE)
 
-## ⚙️ Setup Instructions (Local)
+> India's first **multilingual, hybrid AI scam detection system** that understands Hindi, Hinglish, Marathi, Bengali, Tamil, and more — powered by AWS Bedrock, Amazon Comprehend, and a rule-based engine tuned for the Indian threat landscape.
 
-1. Clone the repository and navigate to the project root.
-2. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Copy the `.env.example` file to `.env` and fill in your details:
-   ```bash
-   cp .env.example .env
-   ```
-5. Run the web server:
-   ```bash
-   uvicorn main:app --reload
-   ```
+[🌐 Web App](#-quick-start) · [🤖 Telegram Bot](https://t.me/ScamShield_Official_Bot) · [☁️ AWS Deploy](#%EF%B8%8F-aws-deployment) · [📖 Upgrade Roadmap](upgradetion.md)
 
-## ☁️ AWS Bedrock Setup Guide
+</div>
 
-1. Log in to your AWS Console and navigate to **Amazon Bedrock**.
-2. Go to **Model Access** on the left menu.
-3. Request access to **Anthropic Claude 3 Sonnet** (`anthropic.claude-3-sonnet-20240229-v1:0`).
-4. Create an IAM User with programmatic access and attach the `AmazonBedrockFullAccess` policy.
-5. Note the Access Key ID and Secret Access Key, and place them in your `.env` file!
+---
 
-## 🚀 EC2 Deployment Steps
+## 📌 The Problem
 
-To deploy ScamShield to an AWS EC2 instance publicly:
+Over **₹1,776 crore** was lost to cyber fraud in India in 2023 alone. Scammers exploit:
+- **Language barriers** — most Indians communicate in regional languages, not English
+- **Psychological manipulation** — Fear, Urgency, Authority, Reward tactics
+- **Local context** — KBC lotteries, Mahadiscom bills, SBI KYC, UPI phishing
 
-1. **Launch EC2**:
-   - Go to EC2 Dashboard and click "Launch Instances".
-   - Select **Ubuntu Server 22.04 LTS**.
-   - Choose `t2.micro` or `t3.micro`.
-   - Under Network settings, allow SSH (Port 22) and HTTP (Port 8000).
-   - Launch and download the key pair.
+Existing tools are English-only, rule-only, or too slow. **ScamShield is different.**
 
-2. **Connect and Install Dependencies**:
-   ```bash
-   ssh -i your-key.pem ubuntu@<your-ec2-public-ip>
-   sudo apt update
-   sudo apt install python3-pip python3-venv git -y
-   ```
+---
 
-3. **Clone and Setup Environment**:
-   ```bash
-   git clone <your-repo-url> scamshield
-   cd scamshield
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   nano .env # Add your AWS keys and Telegram Bot Token here
-   ```
+## ✨ Key Features
 
-4. **Run Uvicorn (Web API)**:
-   ```bash
-   # Run in background via nohup
-   nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
-   ```
-   Now access the Web UI at: `http://<your-ec2-public-ip>:8000`
+| Feature | Description |
+|---|---|
+| 🧠 **Dual AI Engine** | AWS Bedrock Claude 3.5 Sonnet (primary) + Groq Llama 3.3 70B (fallback) |
+| 🌍 **Multilingual** | Detects and responds in Hindi, Hinglish, Marathi, Bengali, Tamil, Gujarati, English |
+| 🔬 **Amazon Comprehend** | Language cross-verification and PII intent detection |
+| 📊 **Hybrid Scoring** | AI semantic score + Indian-specific rule engine (KYC, UPI, Lottery, Extortion) |
+| 🔗 **URL Intelligence** | urlscan.io screenshot capture + IP / SSL / domain reputation |
+| 🧠 **Psychological Analysis** | Detects: Fear, Urgency, Authority, Reward, Impersonation, Scarcity tactics |
+| 🪤 **Honeypot Generator** | AI-generated safe replies to trick scammers into revealing identity |
+| 🤖 **Telegram Bot** | Full conversation interface with scan history |
+| 🗄️ **AWS RDS** | PostgreSQL on Amazon RDS (SQLite fallback for local dev) |
+| ☁️ **AWS Elastic Beanstalk** | One-command deployment, auto-scaling |
 
-5. **Run Telegram Bot**:
-   ```bash
-   nohup python bot.py &
-   ```
+---
 
-## 🧪 Demo Instructions (AI for Bharat Focus)
+## 🏗️ System Architecture
 
-Try testing the system using the Web UI or Telegram Bot with the following Indian context-specific messages:
+```
+┌──────────────────────────────────────────────────────────────┐
+│                      USER INTERFACES                         │
+│         Web UI (FastAPI/Jinja2)  ·  Telegram Bot             │
+└───────────────────────┬──────────────────────────────────────┘
+                        │  POST /api/analyze
+                        ▼
+┌──────────────────────────────────────────────────────────────┐
+│                   FastAPI Backend (main.py)                   │
+│   /health · /api/analyze · /api/stats · /analyze (web form) │
+└────┬──────────────────┬─────────────────────┬───────────────┘
+     │                  │                     │
+     ▼                  ▼                     ▼
+┌─────────┐    ┌─────────────────┐    ┌──────────────┐
+│URLScan  │    │  AI Engine      │    │  Risk Engine │
+│Service  │    │  (ai_engine.py) │    │(risk_engine) │
+│         │    │                 │    │              │
+│urlscan  │    │ ① AWS Bedrock   │    │ Rule boosts: │
+│.io API  │    │   Claude 3.5    │    │ • OTP/KYC    │
+│         │    │   Sonnet        │    │ • UPI/GPay   │
+│Screenshot│   │                 │    │ • Lottery    │
+│ Capture │    │ ② Groq Fallback │    │ • Threats    │
+└────┬────┘    │   Llama 3.3 70B │    │ • Shortened  │
+     │         │                 │    │   URLs       │
+     │         │ ③ Comprehend    │    └──────┬───────┘
+     │         │   Language Check│           │
+     │         └────────┬────────┘           │
+     │                  │                    │
+     └──────────────────┴────────────────────┘
+                        │
+                        ▼ Hybrid Score (capped at 100)
+┌──────────────────────────────────────────────────────────────┐
+│              Amazon RDS PostgreSQL  (database.py)            │
+│    Stores: message · language · risk_score · scam_type       │
+│    model_used · confidence · psychological_trick · timestamp │
+└──────────────────────────────────────────────────────────────┘
+```
 
-**🔴 Hinglish KBC Test (Obfuscated + Reward Manipulation):**
-> "Congratulations! Aap KBC lottery jeet gaye ho. Claim karne ke liye turant apna account details aur O T P share karein."
+---
 
-**🔴 Hindi Electricity Scam (Fear + Urgency):**
-> "Priye grahak, aapka bijli ka connection Mahadiscom dwara aaj raat 9 baje kaat diya jayega. Pichla bill update karne ke liye is link par click karein."
+## 🔧 Tech Stack
 
-**🔴 UPI Fraud Impersonation:**
-> "Your tax refund of Rs 15000 is pending. Please verify your UPI pin on the link fast to receive the transfer."
+| Layer | Technology |
+|---|---|
+| **AI Primary** | AWS Bedrock — Claude 3.5 Sonnet |
+| **AI Fallback** | Groq — Llama 3.3 70B Versatile |
+| **Language Detection** | Amazon Comprehend |
+| **URL Analysis** | urlscan.io API |
+| **Backend** | FastAPI + Uvicorn |
+| **Database** | Amazon RDS PostgreSQL / SQLite (local) |
+| **Bot** | python-telegram-bot |
+| **Hosting** | AWS Elastic Beanstalk (t3.micro) |
+| **Secrets** | AWS Secrets Manager |
+| **Container** | Docker |
 
-**🟢 Baseline Safe Message (Hinglish):**
-> "Bhai, main office pahunch gaya. Shaam ko milenge event ke baad."
+---
+
+## ⚡ Quick Start (Local Development)
+
+### Prerequisites
+- Python 3.11+
+- A [Groq API key](https://console.groq.com) (free)
+- A [Telegram Bot Token](https://t.me/BotFather)
+- AWS credentials (for Bedrock + Comprehend — optional, Groq is the fallback)
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/your-username/scamshield.git
+cd scamshield
+
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Linux/Mac
+
+pip install -r requirements.txt
+```
+
+### 2. Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and fill in your keys:
+
+```env
+# Required
+GROQ_API_KEY=your_groq_api_key
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+URLSCAN_API_KEY=your_urlscan_api_key
+
+# Optional (activates Bedrock as primary AI)
+AWS_ACCESS_KEY_ID=your_aws_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret
+AWS_REGION=us-east-1
+```
+
+### 3. Run
+
+```bash
+# Terminal 1: Start the FastAPI web server
+uvicorn main:app --reload
+# → Open http://localhost:8000
+
+# Terminal 2: Start the Telegram Bot
+python bot.py
+```
+
+---
+
+## 📡 API Reference
+
+### `POST /api/analyze`
+Analyze a message or URL for scam content.
+
+**Request:**
+```json
+{ "message": "URGENT: Your SBI KYC is expired. Click http://sbi-kyc.xyz now!" }
+```
+
+**Response:**
+```json
+{
+  "language": "Hinglish",
+  "risk_score": 95,
+  "ai_base_score": 70,
+  "rule_boost": 25,
+  "scam_type": "KYC Phishing",
+  "psychological_trick": "Fear + Urgency",
+  "explanation": "Yeh message ek phishing scam hai...",
+  "recommended_action": "Is link par bilkul click na karein...",
+  "honeypot_reply": "Please send the official request to my registered bank email.",
+  "confidence": "High",
+  "model_used": "AWS Bedrock (Claude 3.5 Sonnet)",
+  "urlscan_details": { "malicious": true, "screenshot_url": "https://..." }
+}
+```
+
+### `GET /health`
+Returns service health status (used by Elastic Beanstalk).
+
+### `GET /api/stats`
+Returns live aggregate statistics.
+```json
+{
+  "total_scans": 1243,
+  "high_risk_scans": 876,
+  "detection_rate_pct": 70.5,
+  "avg_risk_score": 64.2,
+  "top_scam_type": "KYC Phishing"
+}
+```
+
+---
+
+## 🧪 Test Messages
+
+Copy and paste these into the Web UI or Telegram Bot:
+
+**🔴 High Risk — Hinglish KBC Lottery Scam:**
+```
+Congratulations! Aap KBC lottery jeet gaye ho. Claim karne ke liye turant apna account details aur O T P share karein. Offer sirf aaj valid hai!
+```
+
+**🔴 High Risk — Hindi Electricity Extortion:**
+```
+Priye grahak, aapka bijli ka connection Mahadiscom dwara aaj raat 9 baje kaat diya jayega. Pichla bill update karne ke liye is link par click karein: http://mahadiscom-bill.xyz
+```
+
+**🔴 High Risk — UPI Phishing:**
+```
+Your tax refund of Rs 15000 is pending. Please verify your UPI pin on the link fast to receive the transfer immediately.
+```
+
+**🟢 Safe — Casual Hinglish:**
+```
+Bhai, main office pahunch gaya. Shaam ko milenge event ke baad. Koi baat nahi agar late ho.
+```
+
+---
+
+## ☁️ AWS Deployment
+
+> **Full step-by-step guide → [`aws_setup.md`](aws_setup.md)**
+
+### Quick Deploy Summary
+
+```bash
+# Install EB CLI
+pip install awsebcli
+
+# Configure AWS credentials
+aws configure
+
+# Initialize & deploy
+eb init scamshield --platform python-3.11 --region us-east-1
+eb create scamshield-prod --instance-type t3.micro
+
+# Set environment variables
+eb setenv \
+  GROQ_API_KEY=... \
+  TELEGRAM_BOT_TOKEN=... \
+  URLSCAN_API_KEY=... \
+  DATABASE_URL="postgresql://user:pass@rds-endpoint:5432/scamshield" \
+  AWS_REGION=us-east-1
+
+eb deploy
+eb open
+```
+
+### AWS Services Used
+
+| Service | Purpose | Est. Cost/mo |
+|---|---|---|
+| **Elastic Beanstalk** (t3.micro) | FastAPI hosting | ~$8 |
+| **Amazon RDS** (db.t3.micro) | PostgreSQL database | ~$13 |
+| **AWS Bedrock** (Claude 3.5 Sonnet) | Primary AI model | ~$3–8 |
+| **Amazon Comprehend** | Language detection | ~$1 |
+| **Secrets Manager** | Secure key storage | ~$0.40 |
+| | **Total** | **~$28–35** |
+
+---
+
+## 📁 Project Structure
+
+```
+ScamShield/
+├── main.py               # FastAPI app — all routes + business logic
+├── ai_engine.py          # Bedrock Claude 3.5 Sonnet + Groq fallback + Comprehend
+├── risk_engine.py        # Indian-specific rule-based scoring engine
+├── database.py           # SQLAlchemy models — RDS/SQLite aware
+├── urlscan_service.py    # URL scanning + screenshot extraction
+├── bot.py                # Telegram bot (conversation handler)
+├── templates/
+│   └── index.html        # Web UI — live stats, dark theme, AWS branding
+├── Dockerfile            # Container for AWS / local Docker
+├── Procfile              # Elastic Beanstalk startup command
+├── .ebextensions/
+│   └── options.config    # EB health check + Python config
+├── requirements.txt      # Python dependencies
+├── .env.example          # Environment variable template
+├── aws_setup.md          # Full AWS deployment guide (11 steps)
+└── upgradetion.md        # Future upgrade roadmap
+```
+
+---
+
+## 🔒 Security
+
+- **No secrets in code** — all credentials via `.env` / AWS Secrets Manager
+- **Secrets Manager** stores production keys on AWS (never in `.env` on server)
+- **VPC recommended** — RDS in private subnet for production
+- **Rate limiting** — planned via `slowapi` (see [upgrade roadmap](upgradetion.md))
+
+---
+
+## 🛣️ Roadmap
+
+See the full **[Upgrade Roadmap](upgradetion.md)** for 25+ planned features. Highlights:
+
+- [ ] Amazon Rekognition — screenshot phishing image analysis
+- [ ] Amazon Comprehend PII — auto-flag Aadhaar/PAN requests
+- [ ] WhatsApp Business API integration
+- [ ] AWS SQS + Lambda — async non-blocking URL scans
+- [ ] Live India scam heatmap
+- [ ] Voice call analysis via Amazon Transcribe + Connect
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo
+2. Create a feature branch: `git checkout -b feature/rekognition-scan`
+3. Commit your changes: `git commit -m "feat: add rekognition screenshot analysis"`
+4. Push and open a Pull Request
+
+---
+
+## 📄 License
+
+MIT © 2026 ScamShield Team. Built with ❤️ for Bharat.
+
+---
+
+<div align="center">
+
+**If ScamShield helped you, please ⭐ star the repo!**
+
+[Telegram Bot](https://t.me/ScamShield_Official_Bot) · [AWS Hackathon 2026](https://aws.amazon.com/events/hackathons/)
+
+</div>
