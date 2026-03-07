@@ -86,10 +86,29 @@ def scan_and_analyze_url(url: str) -> Dict[str, Any]:
         
     return result
 
+from virustotal_service import scan_url_vt
+
 def process_message_urls(message: str) -> Dict[str, Any]:
-    """Extracts URL and checks risk. Helper function for the main API pipeline."""
+    """Extracts URL and checks risk using both urlscan.io and VirusTotal."""
     extracted_url = extract_first_url(message)
     if not extracted_url:
         return {"scanned_url": None, "malicious": False, "score": 0, "details": "No URL found"}
+    
+    # 1. Start urlscan.io (for screenshot and their verdict)
+    urlscan_res = scan_and_analyze_url(extracted_url)
+    
+    # 2. Start VirusTotal analysis (secondary threat source)
+    vt_res = scan_url_vt(extracted_url)
+    
+    # 3. Combine Verdicts
+    combined_score = max(urlscan_res.get("score", 0), (vt_res.get("malicious_count", 0) * 10))
+    is_malicious = urlscan_res.get("malicious", False) or vt_res.get("malicious", False)
+    
+    # Merge reports
+    urlscan_res["virustotal"] = vt_res
+    if vt_res.get("malicious"):
+        urlscan_res["malicious"] = True
+        urlscan_res["score"] = min(combined_score, 100)
+        urlscan_res["details"] += f" | {vt_res.get('details')}"
         
-    return scan_and_analyze_url(extracted_url)
+    return urlscan_res

@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScamShield</title>
+    <title>ScamShield – AI Scam Detection for Bharat | AWS Hackathon 2026</title>
+    <meta name="description"
+        content="ScamShield: India's first AI-powered multilingual scam detection system. Powered by AWS Bedrock Claude 3.5 Sonnet. Detects SMS, phishing URLs, and psychological manipulation in Hindi, Hinglish, and regional languages.">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,70 +26,82 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        soc: {
-                            900: '#030712', /* Deep modern black */
-                            800: '#0B0F19',
-                            700: '#111827',
-                            border: 'rgba(255,255,255,0.08)'
-                        },
+                        soc: { 900: '#030712', 800: '#0B0F19', 700: '#111827' },
                         cyber: {
-                            blue: '#3B82F6',
-                            purple: '#A855F7',
-                            green: '#10B981',
-                            red: '#EF4444',
-                            yellow: '#F59E0B',
-                            teal: '#14B8A6'
-                        }
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'dash': 'dash 1.5s ease-out forwards',
-                    },
-                    keyframes: {
-                        dash: {
-                            '0%': { strokeDasharray: '0, 100' },
-                            '100%': { strokeDasharray: 'var(--target-score), 100' }
+                            blue: '#3B82F6', purple: '#A855F7',
+                            green: '#10B981', red: '#EF4444',
+                            yellow: '#F59E0B', teal: '#14B8A6', orange: '#F97316'
                         }
                     }
                 }
             }
         }
     </script>
+
     <style>
+        :root {
+            --soc-border: rgba(255, 255, 255, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             background-color: #030712;
             background-image:
-                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.06) 0%, transparent 40%);
+                radial-gradient(ellipse at 10% 20%, rgba(59, 130, 246, 0.09) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(168, 85, 247, 0.07) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(20, 184, 166, 0.04) 0%, transparent 60%);
             color: #f8fafc;
             min-height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
 
-        /* Glassmorphism Classes */
-        .glass-panel {
-            background: rgba(17, 24, 39, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+        .glass {
+            background: rgba(11, 15, 25, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--soc-border);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
         }
 
         .glass-input {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.35);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
+            color: #e2e8f0;
         }
 
         .glass-input:focus {
             border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.08);
             outline: none;
         }
 
-        /* Gauge SVG Styles */
+        /* Animated gradient border on main card */
+        .glow-card {
+            position: relative;
+        }
+
+        .glow-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(168, 85, 247, 0.3), rgba(20, 184, 166, 0.2));
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: -1;
+        }
+
+        .glow-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Gauge */
         .gauge-container {
-            width: 180px;
-            height: 180px;
+            width: 170px;
+            height: 170px;
             margin: 0 auto;
             position: relative;
         }
@@ -106,103 +120,276 @@
 
         .circle {
             fill: none;
-            stroke-width: 2.5;
+            stroke-width: 2.8;
             stroke-linecap: round;
             transform-origin: center;
             transform: rotate(-90deg);
-            /* Animated via JS setting inline style */
-            transition: stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: stroke-dasharray 1.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Custom Scrollbar */
+        /* AWS Badge */
+        .aws-badge {
+            background: linear-gradient(135deg, rgba(255, 153, 0, 0.15), rgba(255, 153, 0, 0.05));
+            border: 1px solid rgba(255, 153, 0, 0.3);
+            color: #FF9900;
+        }
+
+        /* Pulse dot */
+        .live-pulse {
+            animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+            }
+
+            70% {
+                box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Scan progress bar */
+        @keyframes scanProgress {
+            0% {
+                width: 0%;
+            }
+
+            30% {
+                width: 40%;
+            }
+
+            60% {
+                width: 65%;
+            }
+
+            85% {
+                width: 82%;
+            }
+
+            100% {
+                width: 95%;
+            }
+        }
+
+        .scan-bar {
+            animation: scanProgress 15s ease forwards;
+        }
+
+        /* Result appear */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-up {
+            animation: slideUp 0.45s ease-out forwards;
+        }
+
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-text-blue {
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Stat card hover */
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Loading beam */
+        @keyframes beam {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(400%);
+            }
+        }
+
+        .beam {
+            animation: beam 1.5s ease-in-out infinite;
         }
     </style>
 </head>
 
-<body class="antialiased selection:bg-cyber-purple/30 selection:text-white pb-12">
+<body class="antialiased pb-16">
 
-    <!-- 1️⃣ Navbar -->
-    <nav class="sticky top-0 z-50 glass-panel border-b border-white/5 px-6 py-4 flex justify-between items-center mb-8">
+    <!-- ── NAVBAR ─────────────────────────────────────────────────────────── -->
+    <nav class="sticky top-0 z-50 glass border-b border-white/[0.06] px-6 py-3.5 flex justify-between items-center">
         <div class="flex items-center gap-3">
             <div
-                class="relative flex items-center justify-center w-8 h-8 rounded-lg bg-cyber-blue/20 border border-cyber-blue/30">
+                class="relative w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyber-blue/30 to-cyber-purple/20 border border-cyber-blue/25">
                 <i
-                    class="fa-solid fa-shield-virus text-cyber-blue text-lg shadow-cyber-blue drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"></i>
+                    class="fa-solid fa-shield-virus text-cyber-blue text-base drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"></i>
             </div>
-            <span
-                class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">ScamShield</span>
+            <div>
+                <span class="text-lg font-extrabold tracking-tight gradient-text">ScamShield</span>
+                <span class="hidden sm:inline text-[10px] text-gray-500 ml-2 font-mono">AI for Bharat</span>
+            </div>
         </div>
-        <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
-            <span class="hover:text-white cursor-pointer transition-colors"><i
-                    class="fa-solid fa-globe-asia mr-2 text-cyber-teal"></i>AI for Bharat</span>
+
+        <div class="flex items-center gap-2 sm:gap-4">
+            <!-- AWS Badge -->
+            <div class="hidden md:flex items-center gap-1.5 aws-badge px-3 py-1.5 rounded-lg text-xs font-bold">
+                <svg viewBox="0 0 24 24" class="w-4 h-4 fill-[#FF9900]">
+                    <path
+                        d="M6.763 10.036c0 .296.032.535.088.71.064.176.144.368.256.576.04.064.056.128.056.184 0 .08-.048.16-.152.24l-.503.336a.383.383 0 01-.208.072c-.08 0-.16-.04-.24-.112a2.493 2.493 0 01-.288-.376 6.201 6.201 0 01-.248-.496c-.623.736-1.407 1.104-2.351 1.104-.672 0-1.208-.192-1.6-.576-.392-.384-.592-.896-.592-1.536 0-.68.24-1.232.727-1.648.487-.416 1.135-.624 1.959-.624.272 0 .551.024.847.064.296.04.6.104.92.176v-.583c0-.608-.128-1.032-.376-1.28-.256-.248-.688-.368-1.304-.368-.28 0-.568.032-.864.104-.296.072-.584.16-.864.272a2.296 2.296 0 01-.28.104.488.488 0 01-.128.024c-.112 0-.168-.08-.168-.248v-.392c0-.128.016-.224.056-.28a.59.59 0 01.224-.168c.28-.144.616-.264 1.008-.36A4.96 4.96 0 014.8 6.2c.976 0 1.688.224 2.152.672.456.448.688 1.128.688 2.04v2.688zm-3.24 1.208c.264 0 .536-.048.824-.144.288-.096.544-.272.76-.512.128-.152.224-.32.272-.512.048-.192.08-.424.08-.696v-.336a6.78 6.78 0 00-.736-.136 6.02 6.02 0 00-.752-.048c-.536 0-.928.104-1.192.32-.264.216-.392.52-.392.92 0 .376.096.656.296.848.192.2.472.296.84.296zm6.44.88c-.144 0-.24-.024-.304-.08-.064-.048-.12-.16-.168-.312L7.86 6.848a1.399 1.399 0 01-.072-.32c0-.128.064-.2.192-.2h.784c.152 0 .256.024.312.08.064.048.112.16.16.312l1.48 5.824 1.376-5.824c.04-.16.088-.264.152-.312a.53.53 0 01.32-.08h.64c.152 0 .256.024.32.08.064.048.12.16.152.312l1.392 5.896 1.528-5.896c.048-.16.104-.264.16-.312a.53.53 0 01.312-.08h.744c.128 0 .2.064.2.2 0 .04-.008.08-.016.128a1.16 1.16 0 01-.056.2l-2.152 6.784c-.048.16-.104.264-.168.312-.064.048-.168.08-.304.08h-.688c-.152 0-.256-.024-.32-.08-.064-.056-.12-.16-.152-.32L12.5 7.664l-1.368 5.736c-.04.16-.088.264-.152.32-.064.056-.176.08-.32.08h-.696zm11.44.248c-.416 0-.832-.048-1.232-.144-.4-.096-.712-.2-.92-.32-.128-.072-.216-.152-.248-.224a.56.56 0 01-.048-.224v-.408c0-.168.064-.248.184-.248.048 0 .096.008.144.024.048.016.12.048.2.08.272.12.568.216.888.28.328.064.648.096.976.096.52 0 .92-.088 1.2-.264a.864.864 0 00.424-.776.785.785 0 00-.216-.568c-.144-.152-.416-.288-.808-.416l-1.16-.36c-.584-.184-1.016-.456-1.288-.816a1.953 1.953 0 01-.408-1.208c0-.352.072-.664.216-.936.144-.272.336-.512.584-.704.248-.2.528-.344.848-.448.32-.104.656-.152 1.008-.152.176 0 .36.008.536.032.184.024.352.056.512.096.152.032.296.072.432.12.136.048.24.096.312.144.104.064.176.128.216.2a.48.48 0 01.064.24v.376c0 .168-.064.256-.184.256a.84.84 0 01-.312-.104 3.75 3.75 0 00-1.56-.32c-.472 0-.84.08-1.096.24-.256.16-.384.408-.384.752 0 .224.08.416.24.568.16.152.456.304.88.44l1.136.36c.576.184.992.44 1.248.768.256.328.376.704.376 1.12 0 .36-.072.688-.208.976-.144.288-.336.536-.592.736-.256.208-.56.36-.912.464-.368.112-.76.168-1.184.168z" />
+                </svg>
+                Bedrock Powered
+            </div>
+
+            <!-- Live status -->
+            <div class="flex items-center gap-2 text-xs text-gray-400">
+                <span class="w-2 h-2 rounded-full bg-cyber-green live-pulse inline-block"></span>
+                <span class="hidden sm:inline font-mono">LIVE</span>
+            </div>
+
+            <a href="/dashboard"
+                class="flex items-center gap-1.5 text-xs text-cyber-purple border border-cyber-purple/20 px-3 py-1.5 rounded-lg hover:bg-cyber-purple/10 transition-colors">
+                <i class="fa-solid fa-spider"></i>
+                <span class="hidden sm:inline">Dashboard</span>
+            </a>
             <a href="https://t.me/ScamShield_Official_Bot" target="_blank"
-                class="hover:text-white cursor-pointer transition-colors"><i
-                    class="fa-brands fa-telegram mr-2 text-cyber-blue"></i>Telegram Bot</a>
-            <span class="hover:text-white cursor-pointer transition-colors"><i
-                    class="fa-brands fa-github mr-2"></i>GitHub</span>
-        </div>
-        <div class="md:hidden flex items-center">
-            <i class="fa-solid fa-bars text-gray-400"></i>
+                class="flex items-center gap-1.5 text-xs text-cyber-blue border border-cyber-blue/20 px-3 py-1.5 rounded-lg hover:bg-cyber-blue/10 transition-colors">
+                <i class="fa-brands fa-telegram"></i>
+                <span class="hidden sm:inline">Telegram Bot</span>
+            </a>
         </div>
     </nav>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-6 relative">
+    <main class="max-w-7xl mx-auto px-4 pt-6 grid grid-cols-1 lg:grid-cols-4 gap-5">
 
-        <!-- Left + Center Columns -->
-        <div class="lg:col-span-3 space-y-6">
+        <!-- ── LEFT + CENTER ──────────────────────────────────────────────── -->
+        <div class="lg:col-span-3 space-y-5">
 
-            <!-- 2️⃣ Hero Input Card -->
-            <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
-                <!-- Subtle top border glow -->
+            <!-- Hero heading -->
+            <div class="text-center lg:text-left py-2">
+                <h1 class="text-3xl sm:text-4xl font-black tracking-tight gradient-text mb-2">
+                    India's AI Scam Shield 🛡️
+                </h1>
+                <p class="text-gray-400 text-sm max-w-xl">
+                    Multilingual threat detection in <span class="text-white font-medium">Hindi, Hinglish, Marathi,
+                        Bengali, Tamil</span> & more.
+                    Powered by <span class="gradient-text-blue font-semibold">AWS Bedrock Claude 3.5 Sonnet</span>.
+                </p>
+            </div>
+
+            <!-- Live Stats Bar -->
+            <div id="statsBar" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="stat-card glass rounded-xl p-4 text-center border-white/5">
+                    <div id="statTotal" class="text-2xl font-black font-mono text-white">—</div>
+                    <div class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Total Scans</div>
+                </div>
+                <div class="stat-card glass rounded-xl p-4 text-center border-white/5">
+                    <div id="statHighRisk" class="text-2xl font-black font-mono text-red-400">—</div>
+                    <div class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">High Risk</div>
+                </div>
+                <div class="stat-card glass rounded-xl p-4 text-center border-white/5">
+                    <div id="statRate" class="text-2xl font-black font-mono text-cyber-yellow">—</div>
+                    <div class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Detection Rate</div>
+                </div>
+                <div class="stat-card glass rounded-xl p-4 text-center border-white/5">
+                    <div id="statTopScam" class="text-lg font-black font-mono text-cyber-purple truncate">—</div>
+                    <div class="text-[10px] text-gray-500 uppercase tracking-wider mt-1">Top Scam Type</div>
+                </div>
+            </div>
+
+            <!-- ── INPUT CARD ─────────────────────────────────────────────── -->
+            <div class="glass rounded-2xl p-6 glow-card relative overflow-hidden">
                 <div
-                    class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyber-blue/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                    class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyber-blue/40 to-transparent">
                 </div>
 
-                <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-satellite-dish text-cyber-blue"></i> Threat Telemetry Input
-                </h2>
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fa-solid fa-satellite-dish text-cyber-blue text-sm"></i>
+                    <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-gray-400">Threat Intelligence Input
+                    </h2>
+                </div>
 
-                <form id="analyzeForm" onsubmit="event.preventDefault(); window.analyzeMessage();">
-                    <div class="relative">
-                        <textarea id="messageInput"
-                            class="w-full glass-input rounded-xl p-5 text-gray-200 resize-y min-h-[140px] font-mono text-sm leading-relaxed"
-                            placeholder="Paste suspicious SMS, Email, or WhatsApp message here...&#10;&#10;System detects: Hindi, Hinglish, Marathi, Bengali, Tamil, & English formats."
-                            required></textarea>
+                <form id="analyzeForm" onsubmit="event.preventDefault(); analyzeMessage();">
+                    <textarea id="messageInput"
+                        class="w-full glass-input rounded-xl p-4 font-mono text-sm leading-relaxed resize-y min-h-[130px]"
+                        placeholder="Paste suspicious SMS, WhatsApp message, email, or URL here...&#10;&#10;Supports: English · Hindi · Hinglish · Marathi · Bengali · Tamil · Gujarati"
+                        required></textarea>
 
-                        <!-- Actions Row -->
-                        <div class="flex justify-between items-center mt-4">
-                            <div class="flex items-center gap-4">
-                                <span id="charCount" class="text-xs font-mono text-gray-500">0 chars</span>
+                    <div class="flex justify-between items-center mt-4 flex-wrap gap-3">
+                        <div class="flex items-center gap-4">
+                            <span id="charCount" class="text-xs font-mono text-gray-500">0 chars</span>
+                            <div class="flex gap-2">
+                                <button type="button" onclick="pasteExample(1)"
+                                    class="text-[11px] px-2.5 py-1 rounded-md border border-cyber-red/30 text-cyber-red/70 hover:bg-cyber-red/10 hover:text-cyber-red transition-all font-mono">
+                                    Sample Scam
+                                </button>
+                                <button type="button" onclick="pasteExample(2)"
+                                    class="text-[11px] px-2.5 py-1 rounded-md border border-cyber-green/30 text-cyber-green/70 hover:bg-cyber-green/10 hover:text-cyber-green transition-all font-mono">
+                                    Sample Safe
+                                </button>
                             </div>
-
-                            <button type="submit" id="analyzeBtn"
-                                class="bg-gradient-to-r from-cyber-blue to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition-all shadow-[0_0_15px_rgba(59,130,246,0.25)] hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] flex items-center gap-2">
-                                <span>🔎 Analyze Message Threat</span>
-                            </button>
                         </div>
+
+                        <button type="submit" id="analyzeBtn"
+                            class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-500 hover:to-indigo-600 text-white px-7 py-2.5 rounded-xl font-bold text-sm transition-all shadow-[0_4px_20px_rgba(59,130,246,0.3)] hover:shadow-[0_4px_28px_rgba(59,130,246,0.5)] flex items-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                            <span>Analyze Threat</span>
+                        </button>
                     </div>
                 </form>
 
                 <!-- Loading Overlay -->
                 <div id="loadingOverlay"
-                    class="absolute inset-0 bg-soc-900/90 backdrop-blur-md hidden flex-col justify-center items-center z-10 transition-opacity border border-white/5 rounded-2xl">
-                    <div class="relative w-16 h-16 mb-4">
+                    class="absolute inset-0 bg-soc-900/95 backdrop-blur-md hidden flex-col justify-center items-center z-10 rounded-2xl">
+                    <!-- Progress bar -->
+                    <div class="w-64 h-1 bg-white/5 rounded-full mb-6 overflow-hidden relative">
+                        <div id="scanBar"
+                            class="h-full bg-gradient-to-r from-cyber-blue to-cyber-purple rounded-full scan-bar"></div>
+                        <div class="absolute top-0 left-0 w-8 h-full bg-white/20 rounded-full beam"></div>
+                    </div>
+                    <div class="relative w-12 h-12 mb-4">
                         <svg class="animate-spin w-full h-full text-cyber-blue" xmlns="http://www.w3.org/2000/svg"
                             fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3">
@@ -212,43 +399,48 @@
                             </path>
                         </svg>
                         <i
-                            class="fa-solid fa-microchip absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                            class="fa-solid fa-microchip absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                     </div>
                     <p id="loadingText" class="text-cyber-blue font-mono text-sm tracking-wide animate-pulse">
-                        Initializing semantic analysis pipeline...</p>
+                        Initializing AWS Bedrock pipeline...</p>
+                    <p class="text-gray-600 font-mono text-xs mt-2">Claude 3.5 Sonnet · Comprehend · URLScan</p>
                 </div>
             </div>
 
             <!-- Error Banner -->
             <div id="errorBanner"
-                class="hidden glass-panel border-red-500/30 bg-red-500/10 rounded-xl p-4 flex items-start gap-3">
-                <i class="fa-solid fa-triangle-exclamation text-red-500 mt-0.5"></i>
+                class="hidden glass border-red-500/30 bg-red-500/10 rounded-xl p-4 flex items-start gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-red-400 mt-0.5"></i>
                 <div class="flex-1">
-                    <h4 class="text-sm font-bold text-red-500">Analysis Pipeline Failure</h4>
-                    <p id="errorMsg" class="text-xs text-red-400 mt-1 font-mono"></p>
+                    <h4 class="text-sm font-bold text-red-400">Analysis Pipeline Failure</h4>
+                    <p id="errorMsg" class="text-xs text-red-400/80 mt-1 font-mono"></p>
                 </div>
                 <button onclick="document.getElementById('errorBanner').classList.add('hidden')"
-                    class="text-red-500/60 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                    class="text-red-500/50 hover:text-red-500">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <!-- 3️⃣ Results Dashboard Section (Hidden by Default) -->
-            <div id="resultsDashboard" class="hidden space-y-6 animate-[fadeIn_0.5s_ease-out]">
+            <!-- ── RESULTS DASHBOARD ───────────────────────────────────────── -->
+            <div id="resultsDashboard" class="hidden space-y-5">
 
-                <!-- Top Split: Gauge + Overview -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- AI Engine Badge -->
+                <div id="modelBadge" class="flex items-center gap-2 text-xs font-mono text-gray-500">
+                    <i class="fa-solid fa-robot text-cyber-purple/50"></i>
+                    <span id="modelUsedText">—</span>
+                </div>
 
-                    <!-- Left: Risk Gauge Card -->
+                <!-- Top: Gauge + Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                    <!-- Risk Gauge -->
                     <div
-                        class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden">
-                        <!-- Dynamic glow background -->
+                        class="glass rounded-2xl p-6 flex flex-col items-center justify-center relative overflow-hidden slide-up">
                         <div id="gaugeGlowBg"
-                            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-cyber-green rounded-full blur-[80px] opacity-20 transition-colors duration-1000">
-                        </div>
-
-                        <div class="w-full mb-4">
-                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Threat
-                                Risk Assessment</h3>
-                        </div>
+                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full blur-[90px] opacity-20 transition-all duration-1000"
+                            style="background:#10B981"></div>
+                        <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-5">Threat Risk
+                            Assessment</h3>
 
                         <div class="gauge-container">
                             <svg viewBox="0 0 36 36" class="circular-chart">
@@ -258,161 +450,256 @@
                                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span id="gaugeNumber"
-                                    class="text-4xl font-bold font-mono tracking-tighter text-white">0</span>
-                                <span class="text-[10px] text-gray-500 uppercase tracking-[0.2em] mt-1">Score</span>
+                                <span id="gaugeNumber" class="text-5xl font-black font-mono text-white">0</span>
+                                <span class="text-[10px] text-gray-500 uppercase tracking-[0.15em] mt-1">/ 100</span>
                             </div>
                         </div>
-                        <div class="mt-4 text-center z-10">
+
+                        <div class="mt-5 text-center z-10">
                             <span id="riskSeverityLabel"
-                                class="text-sm font-bold uppercase tracking-widest px-4 py-1.5 rounded-full bg-soc-900/80 border text-cyber-green border-cyber-green/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]">Low
-                                Threat</span>
+                                class="text-xs font-extrabold uppercase tracking-widest px-5 py-2 rounded-full border text-cyber-green border-cyber-green/30 bg-soc-900/80 shadow-[0_0_16px_rgba(16,185,129,0.2)]">
+                                Low Threat
+                            </span>
+                        </div>
+
+                        <!-- Confidence indicator -->
+                        <div id="confidenceRow" class="mt-3 hidden">
+                            <span id="confidenceLabel" class="text-[10px] text-gray-500 font-mono">AI Confidence: <span
+                                    id="confidenceVal" class="text-white"></span></span>
                         </div>
                     </div>
 
-                    <!-- Right: Threat Overview Card (Hybrid DB breakdown) -->
-                    <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                    <!-- Hybrid Intelligence Breakdown -->
+                    <div class="glass p-6 rounded-2xl flex flex-col justify-between slide-up">
                         <div>
-                            <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-                                <div class="flex items-center gap-2">
-                                    <i class="fa-solid fa-layer-group text-gray-400"></i>
-                                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Hybrid
-                                        Intelligence</h3>
-                                </div>
+                            <div class="flex items-center gap-2 border-b border-white/5 pb-4 mb-5">
+                                <i class="fa-solid fa-layer-group text-gray-400 text-sm"></i>
+                                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Hybrid
+                                    Intelligence Engine</h3>
                             </div>
 
-                            <div class="flex flex-wrap gap-2 mb-6">
+                            <div class="flex flex-wrap gap-2 mb-5">
                                 <span
-                                    class="px-3 py-1.5 bg-soc-900 border border-cyber-purple/40 text-cyber-purple rounded-md text-xs font-bold flex items-center gap-1.5">
-                                    <i class="fa-solid fa-tag"></i> <span id="scamTypeBadge">Unknown</span>
+                                    class="px-3 py-1.5 bg-soc-900 border border-cyber-purple/35 text-cyber-purple rounded-lg text-xs font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-bug text-xs"></i>
+                                    <span id="scamTypeBadge">Unknown</span>
                                 </span>
                                 <span
-                                    class="px-3 py-1.5 bg-soc-900 border border-cyber-blue/40 text-cyber-blue rounded-md text-xs font-bold flex items-center gap-1.5">
-                                    <i class="fa-solid fa-language"></i> <span id="langBadge">English</span>
+                                    class="px-3 py-1.5 bg-soc-900 border border-cyber-blue/35 text-cyber-blue rounded-lg text-xs font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-language text-xs"></i>
+                                    <span id="langBadge">English</span>
+                                </span>
+                                <span id="comprehendBadge"
+                                    class="hidden px-3 py-1.5 bg-soc-900 border border-cyber-teal/35 text-cyber-teal rounded-lg text-xs font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                    <span id="comprehendVal">Comprehend</span>
                                 </span>
                             </div>
                         </div>
 
-                        <div class="space-y-3 bg-soc-900/50 rounded-xl p-4 border border-white/5">
+                        <div class="space-y-2.5 bg-black/25 rounded-xl p-4 border border-white/5">
                             <div class="flex justify-between items-center">
-                                <span
-                                    class="text-gray-400 text-xs font-medium uppercase tracking-wide flex items-center gap-2"><i
-                                        class="fa-solid fa-brain text-cyber-purple/70"></i> Semantic Base Score</span>
-                                <span id="aiScoreVal" class="font-mono text-sm text-gray-300">0</span>
+                                <span class="text-gray-400 text-xs font-medium flex items-center gap-2">
+                                    <i class="fa-solid fa-brain text-cyber-purple/60"></i> Bedrock AI Score
+                                </span>
+                                <span id="aiScoreVal" class="font-mono text-sm text-gray-200">0</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span
-                                    class="text-gray-400 text-xs font-medium uppercase tracking-wide flex items-center gap-2"><i
-                                        class="fa-solid fa-microchip text-cyber-blue/70"></i> Deterministic Boost</span>
+                                <span class="text-gray-400 text-xs font-medium flex items-center gap-2">
+                                    <i class="fa-solid fa-microchip text-cyber-blue/60"></i> Rule-Based Boost
+                                </span>
                                 <span id="ruleBoostVal" class="font-mono text-sm text-cyber-blue">+0</span>
                             </div>
-                            <div class="h-[1px] bg-white/10 w-full my-2"></div>
                             <div class="flex justify-between items-center">
-                                <span
-                                    class="text-gray-300 text-xs font-bold uppercase tracking-wide flex items-center gap-2"><i
-                                        class="fa-solid fa-crosshairs text-gray-400"></i> Final Risk Vector</span>
-                                <span id="finalScoreVal" class="font-mono text-lg font-bold">0</span>
+                                <span class="text-gray-400 text-xs font-medium flex items-center gap-2">
+                                    <i class="fa-solid fa-link text-cyan-500/60"></i> urlscan.io Boost
+                                </span>
+                                <span id="urlScanBoostVal" class="font-mono text-sm text-cyan-400">+0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400 text-xs font-medium flex items-center gap-2">
+                                    <i class="fa-solid fa-magnifying-glass-shield text-cyber-green/60"></i> VirusTotal
+                                    Boost
+                                </span>
+                                <span id="vtBoostVal" class="font-mono text-sm text-cyber-green">+0</span>
+                            </div>
+                            <div class="h-px bg-white/10 my-1"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-200 text-xs font-bold flex items-center gap-2">
+                                    <i class="fa-solid fa-crosshairs text-gray-300"></i> Final Risk Vector
+                                </span>
+                                <span id="finalScoreVal" class="font-mono text-xl font-black">0</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Screenshot Panel -->
-                <div id="screenshotContainer" class="hidden">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em] mb-3 ml-1">
-                        <i class="fa-solid fa-camera text-cyber-blue mr-1"></i> Website Preview & Live Intelligence
-                    </h3>
-                    <div class="glass-panel p-2 rounded-2xl border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.3)] mb-6">
-                        <img id="screenshotImg" src="" alt="Live Website Preview"
-                            class="w-full max-h-[400px] object-contain rounded-xl border border-white/5 opacity-90 hover:opacity-100 transition-opacity">
+                <div id="screenshotContainer" class="hidden slide-up">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-camera text-cyber-blue text-sm"></i>
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.15em]">Live Website
+                            Intelligence Preview</h3>
+                    </div>
+                    <div class="glass rounded-2xl p-2 shadow-[0_4px_30px_rgba(0,0,0,0.4)]">
+                        <img id="screenshotImg" src="" alt="Website Screenshot"
+                            class="w-full max-h-[380px] object-contain rounded-xl border border-white/5 opacity-90 hover:opacity-100 transition-opacity cursor-zoom-in">
                     </div>
                 </div>
 
-                <!-- 4️⃣ Psychological Trick Section -->
-                <div>
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em] mb-3 ml-1">Psychological
-                        Vectors Detected</h3>
-                    <div id="psychTricksContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- Cards injected via JS -->
+                <!-- Technical Intel Panel -->
+                <div id="technicalIntelSection" class="hidden slide-up">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-server text-cyan-400 text-sm"></i>
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.15em]">Technical Intelligence
+                            breakdown</h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="glass rounded-xl p-4 border-l-2 border-cyan-500/50">
+                            <div class="text-[10px] text-gray-500 uppercase tracking-wider">Host Domain</div>
+                            <div id="intelDomain" class="text-sm font-mono font-bold text-gray-100 truncate">—</div>
+                        </div>
+                        <div class="glass rounded-xl p-4 border-l-2 border-blue-500/50">
+                            <div class="text-[10px] text-gray-500 uppercase tracking-wider">IP Address</div>
+                            <div id="intelIP" class="text-sm font-mono font-bold text-gray-100">—</div>
+                        </div>
+                        <div class="glass rounded-xl p-4 border-l-2 border-green-500/50">
+                            <div class="text-[10px] text-gray-500 uppercase tracking-wider">SSL Certificate</div>
+                            <div id="intelSSL" class="text-sm font-mono font-bold text-gray-100">—</div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 5️⃣ Explanation Panel -->
-                <div class="glass-panel border-white/10 rounded-2xl overflow-hidden transition-all">
+                <!-- Psychological Vectors -->
+                <div class="slide-up">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-brain text-cyber-purple text-sm"></i>
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.15em]">Psychological Attack
+                            Vectors</h3>
+                    </div>
+                    <div id="psychTricksContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+                </div>
+
+                <!-- Explanation Accordion -->
+                <div class="glass border-white/[0.06] rounded-2xl overflow-hidden slide-up">
                     <button onclick="toggleExplanation()"
-                        class="w-full px-6 py-4 flex justify-between items-center hover:bg-white/5 transition-colors focus:outline-none">
+                        class="w-full px-6 py-4 flex justify-between items-center hover:bg-white/[0.03] transition-colors focus:outline-none">
                         <div class="flex items-center gap-3">
                             <div
-                                class="w-8 h-8 rounded-full bg-cyber-blue/10 flex items-center justify-center border border-cyber-blue/20">
-                                <i class="fa-solid fa-magnifying-glass-chart text-cyber-blue text-sm"></i>
+                                class="w-8 h-8 rounded-lg bg-cyber-blue/10 border border-cyber-blue/20 flex items-center justify-center">
+                                <i class="fa-solid fa-magnifying-glass-chart text-cyber-blue text-xs"></i>
                             </div>
-                            <span class="font-bold text-sm tracking-wide text-gray-200">Threat Matrix Explanation</span>
+                            <span class="font-bold text-sm text-gray-200">Threat Matrix Explanation</span>
                         </div>
                         <i id="explChevron"
                             class="fa-solid fa-chevron-down text-gray-500 transition-transform duration-300"></i>
                     </button>
-                    <div id="explanationContent"
-                        class="hidden border-t border-white/5 px-6 pb-6 pt-4 text-sm text-gray-300 leading-relaxed font-sans bg-black/20">
-                        <p id="explanationText"></p>
+                    <div id="explanationContent" class="hidden border-t border-white/5 px-6 pb-6 pt-4 bg-black/15">
+                        <p id="explanationText" class="text-sm text-gray-300 leading-relaxed"></p>
                     </div>
                 </div>
 
-                <!-- 6️⃣ Recommended Action Panel -->
-                <div id="actionContainer" class="border rounded-2xl p-6 relative overflow-hidden bg-soc-900/50">
-                    <div id="actionLeftBar" class="absolute top-0 left-0 w-[3px] h-full"></div>
-
+                <!-- Recommended Action -->
+                <div id="actionContainer" class="glass border rounded-2xl p-6 relative overflow-hidden slide-up">
+                    <div id="actionLeftBar" class="absolute top-0 left-0 w-[3px] h-full rounded-l-2xl"
+                        style="background:#10B981"></div>
                     <h3 id="actionTitle"
-                        class="text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
+                        class="text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2 text-cyber-green">
                         <i class="fa-solid fa-shield-check"></i> Mitigation Protocol
                     </h3>
-
-                    <div class="bg-black/30 rounded-xl p-4 border border-white/5">
-                        <ul id="actionList" class="list-disc list-inside space-y-2 text-sm text-gray-300 font-medium">
-                            <!-- Injected generated bullets -->
+                    <div class="bg-black/25 rounded-xl p-4 border border-white/5">
+                        <ul id="actionList" class="list-disc list-inside space-y-1.5 text-sm text-gray-300 font-medium">
                         </ul>
                     </div>
 
-                    <!-- Critical Action Alert (Hidden if risk <= 70) -->
-                    <div id="criticalActionBlock"
-                        class="hidden mt-4 bg-red-500/10 border border-red-500/20 rounded-xl p-4">
+                    <!-- Honeypot Section -->
+                    <div id="honeypotBlock"
+                        class="hidden mt-4 bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4">
                         <p
-                            class="text-xs font-bold text-red-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <i class="fa-solid fa-tower-broadcast animate-pulse"></i> External Escalation Required
+                            class="text-xs font-bold text-yellow-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-spider"></i> AI Honeypot Reply (trap the scammer)
+                        </p>
+                        <div class="flex items-start gap-3">
+                            <p id="honeypotText"
+                                class="text-xs text-gray-300 font-mono bg-black/30 rounded-lg p-3 flex-1 leading-relaxed border border-white/5">
+                            </p>
+                            <button onclick="copyHoneypot()"
+                                class="shrink-0 text-yellow-400/60 hover:text-yellow-400 transition-colors p-2 hover:bg-yellow-400/10 rounded-lg">
+                                <i class="fa-solid fa-copy text-sm"></i>
+                            </button>
+                        </div>
+                        <div id="dashboardLink"
+                            class="hidden mt-3 pt-3 border-t border-yellow-500/10 flex items-center justify-between">
+                            <span class="text-[10px] text-gray-500 font-mono">Session created in honeypot
+                                dashboard</span>
+                            <a id="dashboardLinkAnchor" href="/dashboard" target="_blank"
+                                class="flex items-center gap-1.5 text-xs text-cyber-purple hover:text-purple-400 font-bold transition-colors">
+                                <i class="fa-solid fa-spider"></i> View in Dashboard →
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Critical Escalation -->
+                    <div id="criticalActionBlock"
+                        class="hidden mt-4 bg-red-500/8 border border-red-500/20 rounded-xl p-4">
+                        <p class="text-xs font-bold text-red-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-tower-broadcast animate-pulse"></i> Emergency Escalation Channels
                         </p>
                         <div class="flex flex-wrap gap-3">
                             <a href="tel:1930"
-                                class="flex items-center gap-2 bg-soc-900 border border-red-500/30 text-red-400 px-4 py-2 rounded-lg text-sm font-mono shadow-[0_0_10px_rgba(239,68,68,0.15)] hover:bg-red-500/10 transition-colors">
-                                <i class="fa-solid fa-phone"></i> 1930 (Cyber Fraud)
+                                class="flex items-center gap-2 bg-soc-900 border border-red-500/30 text-red-400 px-4 py-2 rounded-lg text-sm font-mono hover:bg-red-500/10 transition-colors">
+                                <i class="fa-solid fa-phone"></i> 1930 – Cyber Fraud Helpline
                             </a>
                             <a href="https://cybercrime.gov.in" target="_blank"
-                                class="flex items-center gap-2 bg-soc-900 border border-blue-500/30 text-blue-400 px-4 py-2 rounded-lg text-sm font-mono shadow-[0_0_10px_rgba(59,130,246,0.15)] hover:bg-blue-500/10 transition-colors">
+                                class="flex items-center gap-2 bg-soc-900 border border-blue-500/30 text-blue-400 px-4 py-2 rounded-lg text-sm font-mono hover:bg-blue-500/10 transition-colors">
                                 <i class="fa-solid fa-gavel"></i> cybercrime.gov.in
                             </a>
                         </div>
                     </div>
                 </div>
 
-            </div>
-        </div>
+            </div><!-- /resultsDashboard -->
+        </div><!-- /left+center -->
 
-        <!-- 7️⃣ Threat History Sidebar -->
+        <!-- ── SIDEBAR ─────────────────────────────────────────────────────── -->
         <div class="hidden lg:block lg:col-span-1">
-            <div class="glass-panel rounded-2xl p-5 sticky top-24 max-h-[calc(100vh-120px)] flex flex-col">
-                <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-4">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-[0.1em] flex items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left"></i> Analysis Log
+            <div class="glass rounded-2xl p-5 sticky top-20 max-h-[calc(100vh-100px)] flex flex-col">
+                <div class="flex items-center justify-between mb-4 border-b border-white/[0.06] pb-4">
+                    <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-gray-500"></i> Analysis Log
                     </h3>
-                    <span class="flex h-2 w-2">
+                    <span class="relative flex h-2 w-2">
                         <span
                             class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-cyber-green opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-cyber-green"></span>
                     </span>
                 </div>
 
-                <!-- History Items -->
-                <div id="historyFeed" class="space-y-3 overflow-y-auto pr-1 flex-1">
+                <!-- AWS Services Used -->
+                <div class="mb-4 space-y-1.5">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-wider font-mono mb-2">AWS Services Active</p>
+                    <div class="flex items-center gap-2 text-xs text-gray-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-green"></span> Bedrock Claude 3.5 Sonnet
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gray-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-blue"></span> Amazon Comprehend
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gray-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-purple"></span> Elastic Beanstalk
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gray-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-teal"></span> RDS PostgreSQL
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gray-400">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-orange"></span> Secrets Manager
+                    </div>
+                </div>
+
+                <div class="h-px bg-white/[0.06] mb-4"></div>
+
+                <div id="historyFeed" class="space-y-2.5 overflow-y-auto flex-1 pr-1">
                     <div
-                        class="text-[11px] text-gray-500 font-mono text-center py-6 border border-dashed border-gray-700 rounded-lg">
+                        class="text-[11px] text-gray-600 font-mono text-center py-6 border border-dashed border-gray-800 rounded-xl">
                         SYSTEM READY<br>AWAITING TELEMETRY
                     </div>
                 </div>
@@ -421,246 +708,419 @@
 
     </main>
 
-    <!-- Vanilla JS Logic -->
     <script>
-        // UI Interaction Handlers
+        // ─── Character counter ───────────────────────────────────────────────
         const messageInput = document.getElementById('messageInput');
-        messageInput.addEventListener('input', (e) => {
+        messageInput.addEventListener('input', e => {
             document.getElementById('charCount').textContent = `${e.target.value.length} chars`;
         });
 
         function toggleExplanation() {
-            const content = document.getElementById('explanationContent');
-            const icon = document.getElementById('explChevron');
-            content.classList.toggle('hidden');
-            icon.classList.toggle('rotate-180');
+            document.getElementById('explanationContent').classList.toggle('hidden');
+            document.getElementById('explChevron').classList.toggle('rotate-180');
         }
 
-        // FontAwesome Mapping for Tricks
+        // ─── Sample messages ─────────────────────────────────────────────────
+        function pasteExample(type) {
+            if (type === 1) {
+                messageInput.value = "🚨 URGENT: Aapka SBI KYC expire ho gaya hai! Abhi update karen warna account band ho jayega. Is link par click karen: http://sbi-kyc-update.xyz/verify";
+            } else {
+                messageInput.value = "Hi! Meeting ka time afternoon 3 baje confirm ho gaya. Please calendar me add kar lena. Thanks!";
+            }
+            document.getElementById('charCount').textContent = `${messageInput.value.length} chars`;
+        }
+
+        // ─── Honeypot copy ───────────────────────────────────────────────────
+        function copyHoneypot() {
+            const text = document.getElementById('honeypotText').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelector('#honeypotBlock button');
+                btn.innerHTML = '<i class="fa-solid fa-check text-sm text-cyber-green"></i>';
+                setTimeout(() => btn.innerHTML = '<i class="fa-solid fa-copy text-sm"></i>', 2000);
+            });
+        }
+
+        // ─── Trick Icons ─────────────────────────────────────────────────────
         const trickIcons = {
             'fear': 'fa-ghost text-red-400',
             'urgency': 'fa-stopwatch text-orange-400',
-            'authority': 'fa-building-columns text-soc-blue-400',
+            'authority': 'fa-building-columns text-blue-400',
             'reward': 'fa-gift text-cyber-purple',
             'scarcity': 'fa-hourglass-half text-yellow-400',
-            'impersonation': 'fa-masks-theater text-cyber-teal'
+            'impersonation': 'fa-masks-theater text-cyber-teal',
+            'phishing': 'fa-fish text-cyan-400',
+            'lottery': 'fa-trophy text-cyber-yellow',
+            'investment': 'fa-chart-line text-green-400'
         };
 
+        // ─── Main analysis function ──────────────────────────────────────────
         async function analyzeMessage() {
             const msg = messageInput.value.trim();
             if (!msg) return;
 
-            // Reset UI State
             document.getElementById('errorBanner').classList.add('hidden');
             document.getElementById('resultsDashboard').classList.add('hidden');
+
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
 
-            // UX Loading Sequence
-            const loadingText = document.getElementById('loadingText');
-            loadingText.textContent = "Running AI semantic language processing...";
+            // Reset scan bar animation
+            const scanBar = document.getElementById('scanBar');
+            scanBar.style.animation = 'none';
+            scanBar.offsetHeight; // reflow
+            scanBar.style.animation = '';
+            scanBar.classList.add('scan-bar');
 
-            let loadTimer = setTimeout(() => {
-                loadingText.textContent = "Executing deterministic rule boosts...";
-            }, 1200);
+            const loadingText = document.getElementById('loadingText');
+            const steps = [
+                'Connecting to AWS Bedrock...',
+                'Running Claude 3.5 Sonnet inference...',
+                'Amazon Comprehend language check...',
+                'Executing rule-based boost engine...',
+                'Fetching URLScan intelligence...',
+                'Compiling threat report...'
+            ];
+            let step = 0;
+            const stepTimer = setInterval(() => {
+                if (step < steps.length) loadingText.textContent = steps[step++];
+            }, 2500);
 
             try {
-                // Fetch to FastAPI backend
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Server returned ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`Server error ${response.status}`);
 
                 const data = await response.json();
-                clearTimeout(loadTimer);
+                clearInterval(stepTimer);
 
-                // Slight artificially delayed execution to allow UI animation
                 setTimeout(() => {
                     overlay.classList.remove('flex');
                     overlay.classList.add('hidden');
                     renderResults(data);
-                }, 500);
+                    loadStats();
+                }, 400);
 
             } catch (err) {
-                clearTimeout(loadTimer);
+                clearInterval(stepTimer);
                 overlay.classList.remove('flex');
                 overlay.classList.add('hidden');
-
                 document.getElementById('errorMsg').textContent = err.message;
                 document.getElementById('errorBanner').classList.remove('hidden');
             }
         }
 
+        // ─── Render results ──────────────────────────────────────────────────
         function renderResults(data) {
-            // Map JSON Data
             const aiScore = data.ai_base_score || 0;
             const finalScore = data.risk_score || 0;
             const ruleBoost = data.rule_boost || 0;
+            const urlDetails = data.urlscan_details || {};
+            const urlBoost = urlDetails.malicious ? 25 : 0;
             const language = data.language || 'Unknown';
-            const scamType = data.scam_type || 'Unclassified Threat';
+            const scamType = data.scam_type || 'Unclassified';
             const explanation = data.explanation || 'No explanation generated.';
-            const recommendedAction = data.recommended_action || 'Proceed with caution.';
+            const action = data.recommended_action || 'Proceed with caution.';
+            const modelUsed = data.model_used || 'AI Engine';
+            const confidence = data.confidence || '';
+            const honeypot = data.honeypot_reply || '';
+            const comprehendLang = data.comprehend_language || '';
 
-            // 1. Color Logic
+            // Color scheme
             let colorHex, colorClass, severityText;
             if (finalScore <= 30) {
-                colorHex = '#10B981'; colorClass = 'text-cyber-green'; severityText = 'Low Threat';
+                colorHex = '#10B981'; colorClass = 'text-cyber-green'; severityText = '✅ Low Threat';
             } else if (finalScore <= 70) {
-                colorHex = '#F59E0B'; colorClass = 'text-cyber-yellow'; severityText = 'Medium Risk';
+                colorHex = '#F59E0B'; colorClass = 'text-cyber-yellow'; severityText = '⚠️ Medium Risk';
             } else {
-                colorHex = '#EF4444'; colorClass = 'text-cyber-red'; severityText = 'CRITICAL THREAT';
+                colorHex = '#EF4444'; colorClass = 'text-cyber-red'; severityText = '🚨 CRITICAL THREAT';
             }
 
-            // 2. Render Gauge
-            const riskCircle = document.getElementById('riskCircle');
-            riskCircle.style.strokeDasharray = `${finalScore}, 100`;
-            riskCircle.setAttribute('stroke', colorHex);
-
+            // Gauge
+            const circle = document.getElementById('riskCircle');
+            circle.style.strokeDasharray = `${finalScore}, 100`;
+            circle.setAttribute('stroke', colorHex);
             document.getElementById('gaugeNumber').textContent = finalScore;
+            document.getElementById('gaugeGlowBg').style.background = colorHex;
 
             const badge = document.getElementById('riskSeverityLabel');
             badge.textContent = severityText;
-            badge.className = `text-sm font-bold uppercase tracking-widest px-4 py-1.5 rounded-full bg-soc-900/80 border ${colorClass}`;
+            badge.style.color = colorHex;
             badge.style.borderColor = `rgba(${hexToRgb(colorHex)}, 0.3)`;
-            badge.style.boxShadow = `0 0 10px rgba(${hexToRgb(colorHex)}, 0.2)`;
+            badge.style.boxShadow = `0 0 20px rgba(${hexToRgb(colorHex)}, 0.25)`;
 
-            // Render glow background
-            const glow = document.getElementById('gaugeGlowBg');
-            glow.className = `absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full blur-[80px] opacity-20 transition-colors duration-1000`;
-            glow.style.backgroundColor = colorHex;
+            // Model used
+            document.getElementById('modelUsedText').textContent = '🤖 ' + modelUsed;
+            document.getElementById('modelBadge').classList.remove('hidden');
 
-            // 3. Render Badges & Breakdown
+            // Confidence
+            if (confidence) {
+                document.getElementById('confidenceVal').textContent = confidence;
+                document.getElementById('confidenceRow').classList.remove('hidden');
+            }
+
+            // Badges
             document.getElementById('scamTypeBadge').textContent = scamType;
             document.getElementById('langBadge').textContent = language;
-            document.getElementById('aiScoreVal').textContent = aiScore;
-            document.getElementById('ruleBoostVal').textContent = `+${ruleBoost}`;
-            document.getElementById('finalScoreVal').textContent = finalScore;
-            document.getElementById('finalScoreVal').className = `font-mono text-xl font-bold ${colorClass}`;
 
-            // 4. Render Screenshot if available
-            const screenshotContainer = document.getElementById('screenshotContainer');
-            if (data.screenshot_url) {
-                document.getElementById('screenshotImg').src = data.screenshot_url;
-                screenshotContainer.classList.remove('hidden');
+            // Comprehend badge
+            if (comprehendLang) {
+                document.getElementById('comprehendVal').textContent = '🔬 ' + comprehendLang;
+                document.getElementById('comprehendBadge').classList.remove('hidden');
             } else {
-                screenshotContainer.classList.add('hidden');
+                document.getElementById('comprehendBadge').classList.add('hidden');
             }
 
-            // 5. Render Psychological Tricks
-            const tricksContainer = document.getElementById('psychTricksContainer');
-            tricksContainer.innerHTML = '';
+            // Score breakdown
+            document.getElementById('aiScoreVal').textContent = aiScore;
+            document.getElementById('ruleBoostVal').textContent = `+${ruleBoost - (urlDetails.malicious ? 30 : 0)}`;
+            document.getElementById('urlScanBoostVal').textContent = `+${urlDetails.score > 0 ? 15 : 0}`;
+            document.getElementById('vtBoostVal').textContent = `+${urlDetails.virustotal && urlDetails.virustotal.malicious ? 15 : 0}`;
+            document.getElementById('finalScoreVal').textContent = finalScore;
+            document.getElementById('finalScoreVal').className = `font-mono text-xl font-black ${colorClass}`;
 
-            // Parse tricks block "Fear + Urgency" into array via RegEx separator
-            let trickList = [];
-            if (data.psychological_trick) {
-                trickList = data.psychological_trick.split(/[\+&,]/).map(t => t.trim()).filter(Boolean);
+            // Screenshot
+            const ssContainer = document.getElementById('screenshotContainer');
+            if (data.screenshot_url || (urlDetails && urlDetails.screenshot_url)) {
+                document.getElementById('screenshotImg').src = data.screenshot_url || urlDetails.screenshot_url;
+                ssContainer.classList.remove('hidden');
+            } else {
+                ssContainer.classList.add('hidden');
             }
-            if (trickList.length === 0) trickList = ["Direct Phishing"];
 
-            trickList.forEach(trick => {
-                let iconClass = 'fa-brain text-cyber-purple';
-                let tLower = trick.toLowerCase();
-                for (const [key, val] of Object.entries(trickIcons)) {
-                    if (tLower.includes(key)) iconClass = val;
+            // Technical Intel
+            const techSection = document.getElementById('technicalIntelSection');
+            if (urlDetails && urlDetails.scanned_url) {
+                document.getElementById('intelDomain').textContent = urlDetails.domain || 'Unknown';
+                document.getElementById('intelIP').textContent = urlDetails.ip || 'Unknown';
+                document.getElementById('intelSSL').textContent = urlDetails.ssl || 'None';
+                techSection.classList.remove('hidden');
+            } else {
+                techSection.classList.add('hidden');
+            }
+
+            // Psychological tricks
+            const tricksEl = document.getElementById('psychTricksContainer');
+            tricksEl.innerHTML = '';
+            let tricks = [];
+            if (data.psychological_trick && data.psychological_trick.toLowerCase() !== 'none') {
+                tricks = data.psychological_trick.split(/[+&,]/).map(t => t.trim()).filter(Boolean);
+            }
+            if (tricks.length === 0) tricks = ['Direct Phishing'];
+
+            tricks.forEach(trick => {
+                let iconCls = 'fa-brain text-cyber-purple';
+                for (const [k, v] of Object.entries(trickIcons)) {
+                    if (trick.toLowerCase().includes(k)) { iconCls = v; break; }
                 }
-
-                tricksContainer.innerHTML += `
-                    <div class="glass-panel rounded-xl p-4 flex items-center gap-4 bg-soc-900/50 border-white/5 hover:bg-soc-800 transition-colors border-l-2" style="border-left-color: ${colorHex}">
-                        <div class="w-10 h-10 rounded-full bg-black/40 flex items-center justify-center border border-white/5">
-                            <i class="fa-solid ${iconClass} text-lg"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="text-xs text-gray-400 uppercase tracking-wider mb-0.5">Tactic</h4>
-                            <p class="text-sm font-bold text-gray-200 capitalize">${trick}</p>
-                        </div>
+                tricksEl.innerHTML += `
+                <div class="glass rounded-xl p-4 flex items-center gap-3 border-l-2 hover:bg-white/[0.02] transition-colors"
+                     style="border-left-color:${colorHex}">
+                    <div class="w-9 h-9 shrink-0 rounded-lg bg-black/40 border border-white/5 flex items-center justify-center">
+                        <i class="fa-solid ${iconCls}"></i>
                     </div>
-                `;
+                    <div>
+                        <div class="text-[10px] text-gray-500 uppercase tracking-wider">Attack Vector</div>
+                        <div class="text-sm font-bold text-gray-100 capitalize">${trick}</div>
+                    </div>
+                </div>`;
             });
 
-            // 5. Render Explanation
+            // Explanation
             document.getElementById('explanationText').textContent = explanation;
+            document.getElementById('explanationContent').classList.remove('hidden');
+            document.getElementById('explChevron').classList.add('rotate-180');
 
-            // 6. Render Recommended Actions
-            const currentActionContainer = document.getElementById('actionContainer');
-            const actionLeftBar = document.getElementById('actionLeftBar');
+            // Action
+            const actionContainer = document.getElementById('actionContainer');
+            const leftBar = document.getElementById('actionLeftBar');
             const actionTitle = document.getElementById('actionTitle');
-
-            currentActionContainer.style.borderColor = `rgba(${hexToRgb(colorHex)}, 0.3)`;
-            currentActionContainer.style.backgroundColor = `rgba(${hexToRgb(colorHex)}, 0.05)`;
-            actionLeftBar.style.backgroundColor = colorHex;
+            actionContainer.style.borderColor = `rgba(${hexToRgb(colorHex)}, 0.25)`;
+            actionContainer.style.backgroundColor = `rgba(${hexToRgb(colorHex)}, 0.04)`;
+            leftBar.style.background = colorHex;
             actionTitle.className = `text-sm font-bold uppercase tracking-widest mb-4 flex items-center gap-2 ${colorClass}`;
-            if (finalScore > 70) actionTitle.innerHTML = `<i class="fa-solid fa-triangle-exclamation animate-pulse"></i> Critical Containment Protocol`;
-            else actionTitle.innerHTML = `<i class="fa-solid fa-shield-check"></i> Mitigation Protocol`;
+            actionTitle.innerHTML = finalScore > 70
+                ? `<i class="fa-solid fa-triangle-exclamation animate-pulse"></i> Critical Containment Protocol`
+                : `<i class="fa-solid fa-shield-check"></i> Mitigation Protocol`;
 
-            // Make simple bullet points out of sentences
             const actionList = document.getElementById('actionList');
             actionList.innerHTML = '';
-            let sentences = recommendedAction.split('.').filter(s => s.trim().length > 3);
-            if (sentences.length === 0) sentences = [recommendedAction];
-
-            sentences.forEach(s => {
-                actionList.innerHTML += `<li>${s.trim()}</li>`;
+            action.split('.').filter(s => s.trim().length > 3).forEach(s => {
+                actionList.innerHTML += `<li>${s.trim()}.</li>`;
             });
 
-            const critBlock = document.getElementById('criticalActionBlock');
-            if (finalScore > 70) {
-                critBlock.classList.remove('hidden');
+            // Honeypot
+            if (honeypot && finalScore > 40) {
+                document.getElementById('honeypotText').textContent = honeypot;
+                document.getElementById('honeypotBlock').classList.remove('hidden');
+                // Show dashboard link if a session was created
+                const sessionToken = data.honeypot_session_token;
+                const dashLink = document.getElementById('dashboardLink');
+                if (sessionToken) {
+                    document.getElementById('dashboardLinkAnchor').href = '/dashboard';
+                    dashLink.classList.remove('hidden');
+                } else {
+                    dashLink.classList.add('hidden');
+                }
             } else {
-                critBlock.classList.add('hidden');
+                document.getElementById('honeypotBlock').classList.add('hidden');
             }
 
-            // Unhide Dashboard
+            // Critical block
+            document.getElementById('criticalActionBlock').classList.toggle('hidden', finalScore <= 70);
+
+            // Show dashboard
             document.getElementById('resultsDashboard').classList.remove('hidden');
 
-            // Add to Sidebar Feed
+            // Sidebar history
             addToHistory(scamType, finalScore, colorClass, colorHex);
         }
 
-        // Helper: HEX to RGB string for rgba usage
-        function hexToRgb(hex) {
-            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ?
-                parseInt(result[1], 16) + ", " + parseInt(result[2], 16) + ", " + parseInt(result[3], 16)
-                : "255, 255, 255";
+        // ─── Load live stats ─────────────────────────────────────────────────
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                if (!res.ok) return;
+                const s = await res.json();
+                document.getElementById('statTotal').textContent = s.total_scans.toLocaleString();
+                document.getElementById('statHighRisk').textContent = s.high_risk_scans.toLocaleString();
+                document.getElementById('statRate').textContent = s.detection_rate_pct + '%';
+                document.getElementById('statTopScam').textContent = s.top_scam_type;
+            } catch (e) { /* silent */ }
         }
 
-        // Add to Sidebar
+        // ─── Sidebar history ─────────────────────────────────────────────────
         function addToHistory(type, score, colorClass, colorHex) {
             const feed = document.getElementById('historyFeed');
+            if (feed.innerHTML.includes('SYSTEM READY')) feed.innerHTML = '';
 
-            // Remove initial system message
-            if (feed.innerHTML.includes('SYSTEM READY')) {
-                feed.innerHTML = '';
-            }
-
-            const timeCode = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const item = document.createElement('div');
-            item.className = 'bg-soc-900 border border-white/5 rounded-lg p-3 text-sm animate-[fadeIn_0.5s_ease-out] hover:border-white/20 transition-colors flex justify-between items-center';
+            item.className = 'bg-soc-900/80 border border-white/[0.06] rounded-xl p-3 text-sm flex justify-between items-center hover:border-white/15 transition-colors';
             item.innerHTML = `
-                <div class="flex flex-col">
-                    <span class="text-[10px] text-gray-500 font-mono mb-1">${timeCode}</span>
-                    <span class="font-medium text-gray-300 truncate max-w-[150px]" title="${type}">${type}</span>
+                <div>
+                    <div class="text-[10px] text-gray-600 font-mono">${time}</div>
+                    <div class="font-medium text-gray-300 text-xs mt-0.5 truncate max-w-[140px]" title="${type}">${type}</div>
                 </div>
-                <div class="px-2 py-1 rounded border bg-opacity-10 font-mono text-xs font-bold ${colorClass}" 
-                     style="border-color: rgba(${hexToRgb(colorHex)}, 0.3); background-color: rgba(${hexToRgb(colorHex)}, 0.1);">
-                    ${score}%
-                </div>
-            `;
-
+                <div class="px-2.5 py-1 rounded-lg border font-mono text-xs font-bold ${colorClass}"
+                     style="border-color:rgba(${hexToRgb(colorHex)},0.3);background:rgba(${hexToRgb(colorHex)},0.1)">
+                    ${score}
+                </div>`;
             feed.prepend(item);
-
-            // Keep only latest 10 items
-            if (feed.children.length > 10) {
-                feed.removeChild(feed.lastChild);
-            }
+            if (feed.children.length > 12) feed.removeChild(feed.lastChild);
         }
+
+        // ─── Helpers ─────────────────────────────────────────────────────────
+        function hexToRgb(hex) {
+            const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return r ? `${parseInt(r[1], 16)}, ${parseInt(r[2], 16)}, ${parseInt(r[3], 16)}` : '255,255,255';
+        }
+
+        // Load stats on page open
+        loadStats();
     </script>
+
+    <!-- ── FOOTER ──────────────────────────────────────────────────────────── -->
+    <footer class="mt-16 border-t border-white/[0.06] glass">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+
+                <!-- Brand -->
+                <div>
+                    <div class="flex items-center gap-2.5 mb-3">
+                        <div
+                            class="w-8 h-8 flex items-center justify-center rounded-xl bg-gradient-to-br from-cyber-blue/30 to-cyber-purple/20 border border-cyber-blue/25">
+                            <i class="fa-solid fa-shield-virus text-cyber-blue text-sm"></i>
+                        </div>
+                        <span class="font-extrabold text-white tracking-tight">ScamShield</span>
+                    </div>
+                    <p class="text-gray-500 text-xs leading-relaxed">
+                        India's first AI-powered Agentic Honeypot.
+                        Protecting <span class="text-white/60">Bharat</span> from digital fraud.
+                    </p>
+                    <p class="mt-3 text-[10px] font-mono text-gray-700">
+                        Built for <span class="text-[#FF9900]">AWS Hackathon 2026</span> 🏆
+                    </p>
+                </div>
+
+                <!-- Tech Stack -->
+                <div>
+                    <h4 class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Powered By</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-xs text-gray-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#FF9900]"></span>
+                            AWS Bedrock — Claude 3.5 Sonnet
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyber-blue"></span>
+                            Amazon Comprehend
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyber-green"></span>
+                            Amazon RDS PostgreSQL
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyber-purple"></span>
+                            AWS Elastic Beanstalk
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gray-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyber-teal"></span>
+                            urlscan.io · VirusTotal
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Quick Links</h4>
+                    <div class="space-y-2.5">
+                        <a href="/"
+                            class="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-solid fa-shield-virus text-cyber-blue w-3.5"></i> Scam Scanner
+                        </a>
+                        <a href="/dashboard"
+                            class="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-solid fa-spider text-cyber-purple w-3.5"></i> Honeypot Dashboard
+                        </a>
+                        <a href="https://t.me/ScamShield_Official_Bot" target="_blank"
+                            class="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-brands fa-telegram text-cyber-blue w-3.5"></i> Telegram Bot
+                        </a>
+                        <a href="tel:1930"
+                            class="flex items-center gap-2 text-xs text-gray-400 hover:text-cyber-red transition-colors">
+                            <i class="fa-solid fa-phone text-cyber-red w-3.5"></i> Cyber Helpline: 1930
+                        </a>
+                        <a href="https://cybercrime.gov.in" target="_blank"
+                            class="flex items-center gap-2 text-xs text-gray-400 hover:text-cyber-blue transition-colors">
+                            <i class="fa-solid fa-gavel text-cyber-blue w-3.5"></i> cybercrime.gov.in
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom bar -->
+            <div
+                class="mt-8 pt-6 border-t border-white/[0.05] flex flex-col sm:flex-row justify-between items-center gap-3">
+                <p class="text-[11px] text-gray-700 font-mono">
+                    © 2026 ScamShield. Built with ❤️ for a safer digital Bharat.
+                </p>
+                <div class="flex items-center gap-3">
+                    <span class="text-[10px] font-mono text-gray-700">v2.0.0</span>
+                    <span class="w-1 h-1 rounded-full bg-gray-800"></span>
+                    <span class="text-[10px] font-mono text-gray-700">FastAPI + AWS Bedrock</span>
+                    <span class="w-1 h-1 rounded-full bg-gray-800"></span>
+                    <span class="flex items-center gap-1 text-[10px] font-mono text-cyber-green">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyber-green live-pulse"></span> LIVE
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
 </body>
+
 </html>

@@ -1,10 +1,12 @@
 fastapi
-uvicorn
+uvicorn[standard]
 python-multipart
 boto3
+botocore
 python-telegram-bot
 sqlalchemy
 python-dotenv
 jinja2
 requests
 groq
+psycopg2-binary

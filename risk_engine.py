@@ -48,7 +48,7 @@ def calculate_rule_based_score(message: str) -> int:
         
     return score
 
-def analyze_risk(message: str, llm_result: Dict[str, Any]) -> Dict[str, Any]:
+def analyze_risk(message: str, llm_result: Dict[str, Any], url_threat: Dict[str, Any] = None) -> Dict[str, Any]:
     """
     Combines LLM score with rule-based score.
     Caps final score at 100.
@@ -56,11 +56,17 @@ def analyze_risk(message: str, llm_result: Dict[str, Any]) -> Dict[str, Any]:
     rule_score = calculate_rule_based_score(message)
     base_llm_score = llm_result.get("risk_score", 0)
     
-    final_score = base_llm_score + rule_score
+    # URL Scan Bonus
+    url_boost = 0
+    if url_threat and url_threat.get("malicious"):
+        url_boost = 30 # Significant boost for verified malicious links
+        llm_result["explanation"] += f" | {url_threat.get('details')}"
+    
+    final_score = base_llm_score + rule_score + url_boost
     if final_score > 100:
         final_score = 100
         
     llm_result["ai_base_score"] = base_llm_score
     llm_result["risk_score"] = final_score
-    llm_result["rule_boost"] = rule_score
+    llm_result["rule_boost"] = rule_score + url_boost
     return llm_result
