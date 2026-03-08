@@ -54,13 +54,17 @@ def analyze_risk(message: str, llm_result: Dict[str, Any], url_threat: Dict[str,
     Caps final score at 100.
     """
     rule_score = calculate_rule_based_score(message)
-    base_llm_score = llm_result.get("risk_score", 0)
+    try:
+        base_llm_score = int(llm_result.get("risk_score", 0))
+    except (ValueError, TypeError):
+        base_llm_score = 0
     
     # URL Scan Bonus
     url_boost = 0
     if url_threat and url_threat.get("malicious"):
         url_boost = 30 # Significant boost for verified malicious links
-        llm_result["explanation"] += f" | {url_threat.get('details')}"
+        explanation = llm_result.get("explanation", "")
+        llm_result["explanation"] = f"{explanation} | {url_threat.get('details')}"
     
     final_score = base_llm_score + rule_score + url_boost
     if final_score > 100:
