@@ -8,5 +8,6 @@ sqlalchemy
 python-dotenv
 jinja2
 requests
+httpx
 groq
 psycopg2-binary

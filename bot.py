@@ -1,5 +1,6 @@
 import os
 import requests
+import httpx
 from datetime import datetime
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -157,12 +158,23 @@ async def handle_scan_request(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     try:
         # 2. Call FastAPI Backend (local or AWS depending on API_URL env var)
-        response = requests.post(
-            API_URL,
-            json={"message": user_message},
-            timeout=60
-        )
-        response.raise_for_status()
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(API_URL, json={"message": user_message})
+            
+        if response.status_code != 200:
+            error_msg = response.text
+            try:
+                error_msg = response.json().get("detail", error_msg)
+            except Exception:
+                pass
+            
+            await processing_msg.edit_text(
+                f"⚠️ *Analysis Service Error*\n\nThe backend returned an error (HTTP {response.status_code}):\n`{error_msg}`\n\nPlease ensure the backend is running properly.",
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=get_back_keyboard()
+            )
+            return CHOOSING_ACTION
+
         result = response.json()
 
         score = result.get("risk_score", 0)
@@ -283,9 +295,9 @@ async def handle_scan_request(update: Update, context: ContextTypes.DEFAULT_TYPE
             reply_markup=result_keyboard
         )
 
-    except requests.Timeout:
+    except (requests.Timeout, httpx.TimeoutException):
         await processing_msg.edit_text(
-            "⏱️ *Analysis timed out.*\n\nThe URL scan takes up to 15s. Please try again.",
+            "⏱️ *Analysis timed out.*\n\nThe scan took too long. Please try again.",
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=get_back_keyboard()
         )
@@ -335,12 +347,20 @@ async def handle_honeypot_log(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     try:
         api_base = BASE_URL.rstrip('/')
-        resp = requests.post(
-            f"{api_base}/api/honeypot/session/{token}/message",
-            json={'sender': sender, 'content': content},
-            timeout=10
-        )
-        resp.raise_for_status()
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.post(
+                f"{api_base}/api/honeypot/session/{token}/message",
+                json={'sender': sender, 'content': content}
+            )
+            
+        if resp.status_code != 200:
+            error_msg = resp.text
+            try:
+                error_msg = resp.json().get("detail", error_msg)
+            except Exception:
+                pass
+            raise Exception(f"HTTP {resp.status_code}: {error_msg}")
+
         await update.message.reply_text(
             f"✅ *Message logged* as *{'you (victim reply)' if sender == 'user' else 'scammer'}*\n\n"
             f"`{content[:150]}{'...' if len(content) > 150 else ''}`\n\n"
